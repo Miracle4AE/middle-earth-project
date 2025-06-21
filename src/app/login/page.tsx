@@ -12,12 +12,12 @@ export default function LoginPage() {
   const [resetLink, setResetLink] = useState("");
   const [showNewPass, setShowNewPass] = useState(false);
   const [newPass, setNewPass] = useState("");
-  const [resetUser, setResetUser] = useState<any>(null);
+  const [resetUser, setResetUser] = useState<{ username: string } | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const user = users.find((u: any) => u.username === username && u.password === password);
+    const user = users.find((u: { username: string, password: any }) => u.username === username && u.password === password);
     if (user) {
       localStorage.setItem("lotr-current-user", JSON.stringify(user));
       setMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
@@ -30,7 +30,7 @@ export default function LoginPage() {
   const handleResetRequest = (e: React.FormEvent) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const user = users.find((u: any) => u.email === resetEmail);
+    const user = users.find((u: { email: string, username: string }) => u.email === resetEmail);
     if (user) {
       setResetUser(user);
       setResetLink("/reset-password?user=" + encodeURIComponent(user.username));
@@ -42,9 +42,9 @@ export default function LoginPage() {
 
   const handleNewPass = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPass) return;
+    if (!newPass || !resetUser) return;
     const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const idx = users.findIndex((u: any) => u.username === resetUser.username);
+    const idx = users.findIndex((u: { username: string }) => u.username === resetUser.username);
     if (idx !== -1) {
       users[idx].password = newPass;
       localStorage.setItem("lotr-users", JSON.stringify(users));

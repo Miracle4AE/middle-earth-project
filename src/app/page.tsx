@@ -56,7 +56,7 @@ export default function Home() {
           transition={{ duration: 1, delay: 0.5 }}
           className="text-2xl md:text-3xl font-semibold mb-6 text-gray-200 text-center"
         >
-          Orta Dünya'ya Hoş Geldin
+          Orta Dünya&apos;ya Hoş Geldin
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -64,7 +64,7 @@ export default function Home() {
           transition={{ duration: 1, delay: 1 }}
           className="max-w-xl text-center mb-8 text-lg md:text-xl text-gray-300"
         >
-          Efsanelerin, kahramanların ve yüzüğün peşindeki yolculuğun başladığı yere adım attın. Orta Dünya'nın büyülü atmosferine hazır mısın?
+          Efsanelerin, kahramanların ve yüzüğün peşindeki yolculuğun başladığı yere adım attın. Orta Dünya&apos;nın büyülü atmosferine hazır mısın?
         </motion.p>
         <MotionLink
           href="/shop"

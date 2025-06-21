@@ -21,7 +21,7 @@ export default function MapPage() {
             className="w-full h-auto object-cover opacity-95 hover:opacity-100 transition duration-500"
           />
         </div>
-        <p className="text-lg text-gray-200 mt-8">Harita üzerinde gezinebilir ve Orta Dünya'nın büyüsünü keşfedebilirsin!</p>
+        <p className="text-lg text-gray-200 mt-8">Harita üzerinde gezinebilir ve Orta Dünya&apos;nın büyüsünü keşfedebilirsin!</p>
       </div>
     </motion.div>
   );

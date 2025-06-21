@@ -26,7 +26,7 @@ export default function RegisterPage() {
     }
     // Kullanıcıları localStorage'da sakla
     const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    if (users.find((u: any) => u.username === form.username)) {
+    if (users.find((u: { username: string }) => u.username === form.username)) {
       setMessage("Bu kullanıcı adı zaten alınmış!");
       return;
     }

@@ -140,11 +140,11 @@ const initialProducts: Record<string, Product[]> = {
 
 export default function ShopPage() {
   const [selected, setSelected] = useState(categories[0].name);
-  const [products, setProducts] = useState<Record<string, Product[]>>(initialProducts);
+  const [products] = useState<Record<string, Product[]>>(initialProducts);
   const currentProducts = products[selected] || [];
   const gridRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ username: string } | null>(null);
 
   useEffect(() => {
     if (firstRender.current) {
@@ -232,7 +232,7 @@ export default function ShopPage() {
                   <motion.button
                     whileHover={{ scale: 1.08, boxShadow: "0 0 30px #FFD700" }}
                     className="w-full px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black font-bold text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900 border-2 border-yellow-700 ring-2 ring-yellow-300 mt-2"
-                    onClick={() => alert('Tebrikler! Bu ürünü satın aldın (Tabii ki şaka :) )')}
+                    onClick={() => alert("Tebrikler! Bu ürünü satın aldın (Tabii ki şaka :) )")}
                   >
                     Satın Al
                   </motion.button>
