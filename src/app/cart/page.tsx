@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 
+type CartItem = { name: string; category: string; price: string };
+
 export default function CartPage() {
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
   const [message, setMessage] = useState("");
 
@@ -10,7 +12,7 @@ export default function CartPage() {
     const c = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     setCart(c);
     let t = 0;
-    c.forEach((item: any) => {
+    c.forEach((item: CartItem) => {
       const price = parseInt(item.price.replace(/[^0-9]/g, ""));
       t += price;
     });

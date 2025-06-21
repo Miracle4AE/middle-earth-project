@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ name: string } | null>(null);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const u = localStorage.getItem("lotr-current-user");

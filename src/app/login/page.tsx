@@ -17,7 +17,7 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const user = users.find((u: { username: string, password: any }) => u.username === username && u.password === password);
+    const user = users.find((u: { username: string, password: unknown }) => u.username === username && u.password === password);
     if (user) {
       localStorage.setItem("lotr-current-user", JSON.stringify(user));
       setMessage("Giriş başarılı! Yönlendiriliyorsunuz...");

@@ -163,22 +163,17 @@ export default function CharactersPage() {
       transition={{ duration: 0.5 }}
     >
       <div className="relative flex flex-col items-center justify-center min-h-screen text-white overflow-hidden">
-        {/* Arka plan yüzük görseli klasik img ile, sabit ve daha belirgin */}
-        <img
+        {/* Arka plan yüzük görseli */}
+        <Image
           src="/images/one-ring.png"
           alt="One Ring"
+          layout="fill"
+          objectFit="contain"
+          className="opacity-25 z-0 pointer-events-none"
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            objectFit: "contain",
-            opacity: 0.22,
-            zIndex: 0,
-            pointerEvents: "none",
             filter: "drop-shadow(0 0 80px gold) blur(2px)"
           }}
+          priority
         />
         <h1 className="font-[Ringbearer] text-5xl md:text-7xl font-extrabold mb-12 text-yellow-400 drop-shadow-[0_0_20px_gold] text-center z-10">Karakterler</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-6xl px-4 z-10">
