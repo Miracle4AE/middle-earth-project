@@ -1,13 +1,67 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Preloader from "./Preloader";
 
 const MotionLink = motion(Link);
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [videoSrc, setVideoSrc] = useState("");
+
+  useEffect(() => {
+    const videoUrl = "/video/lotr-intro.mp4";
+
+    async function fetchVideo() {
+      const response = await fetch(videoUrl);
+      if (!response.ok) {
+        console.error("Video yüklenemedi!");
+        setIsLoaded(true);
+        setVideoSrc(videoUrl);
+        return;
+      }
+
+      const contentLength = response.headers.get("content-length");
+      if (!contentLength || !response.body) {
+        setIsLoaded(true);
+        setVideoSrc(videoUrl);
+        return;
+      }
+
+      const total = parseInt(contentLength, 10);
+      let loaded = 0;
+
+      const reader = response.body.getReader();
+      const stream = new ReadableStream({
+        start(controller) {
+          function push() {
+            reader.read().then(({ done, value }) => {
+              if (done) {
+                controller.close();
+                return;
+              }
+              loaded += value.length;
+              setLoadingProgress((loaded / total) * 100);
+              controller.enqueue(value);
+              push();
+            });
+          }
+          push();
+        },
+      });
+
+      const videoBlob = await new Response(stream).blob();
+      const blobUrl = URL.createObjectURL(videoBlob);
+      setVideoSrc(blobUrl);
+      setIsLoaded(true);
+    }
+
+    fetchVideo();
+  }, []);
 
   const handleToggleMute = () => {
     if (videoRef.current) {
@@ -17,6 +71,10 @@ export default function Home() {
       videoRef.current.play();
     }
   };
+
+  if (!isLoaded) {
+    return <Preloader progress={loadingProgress} />;
+  }
 
   return (
     <motion.div
@@ -30,9 +88,9 @@ export default function Home() {
         autoPlay
         loop
         muted={isMuted}
+        src={videoSrc}
         className="fixed top-0 left-0 w-full h-full object-cover -z-10"
       >
-        <source src="/video/lotr-intro.mp4" type="video/mp4" />
         Tarayıcınız video etiketini desteklemiyor.
       </video>
       <button
