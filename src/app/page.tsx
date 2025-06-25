@@ -73,7 +73,7 @@ export default function Home() {
   };
 
   if (!isLoaded) {
-    return <Preloader progress={loadingProgress} />;
+    return <Preloader />;
   }
 
   return (
