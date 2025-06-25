@@ -58,10 +58,10 @@ export default function Home() {
     fetchVideo();
   }, []);
 
-  // Overlay'i 15 saniye sonra gizle
+  // Overlay'i 25 saniye sonra gizle
   useEffect(() => {
     if (isLoaded) {
-      const timer = setTimeout(() => setShowOverlay(false), 15000);
+      const timer = setTimeout(() => setShowOverlay(false), 25000);
       return () => clearTimeout(timer);
     }
   }, [isLoaded]);
