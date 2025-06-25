@@ -55,7 +55,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-black text-yellow-300">
         <h1 className="font-[Ringbearer] text-4xl mb-6 drop-shadow-[0_0_20px_gold]">Ödeme Başarılı!</h1>
-        <p className="text-lg mb-8">Siparişin alındı, Orta Dünya'ya hoş geldin! 🧙‍♂️</p>
+        <p className="text-lg mb-8">Siparişin alındı, Orta Dünya&apos;ya hoş geldin! 🧙‍♂️</p>
         <button onClick={() => router.push("/")} className="bg-yellow-400 text-black font-bold py-2 px-8 rounded hover:bg-yellow-500 transition">Anasayfaya Dön</button>
       </div>
     );

@@ -8,7 +8,6 @@ type CartItem = { name: string; category: string; price: string; img: string; qu
 export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
-  const [message, setMessage] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -98,7 +97,6 @@ export default function CartPage() {
           </table>
           <div className="text-right text-yellow-300 text-xl font-bold mb-4">Toplam: {total.toLocaleString()}₺</div>
           <button onClick={handleBuy} className="bg-yellow-400 text-black font-bold py-2 px-8 rounded hover:bg-yellow-500 transition">Satın Al</button>
-          {message && <div className="text-green-400 font-bold text-center mt-4">{message}</div>}
         </div>
       )}
     </div>
