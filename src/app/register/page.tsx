@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    let updatedForm = { ...form, [name]: value };
+    const updatedForm = { ...form, [name]: value };
     if (
       (name === "birthDay" || name === "birthMonth" || name === "birthYear") &&
       (updatedForm.birthDay && updatedForm.birthMonth && updatedForm.birthYear)
