@@ -82,7 +82,7 @@ export default function ProfileInfoPage() {
       <form onSubmit={handleSave} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
         <input name="firstName" value={form.firstName} onChange={handleChange} placeholder="Ad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
         <input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Soyad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-        <input name="birthDate" value={form.birthDate} onChange={handleChange} placeholder="Doğum Tarihi (GG.AA.YYYY)" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+        <input name="birthDate" type="date" value={form.birthDate} onChange={handleChange} max="2025-12-31" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
         <select name="gender" value={form.gender} onChange={handleChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100">
           <option value="">Cinsiyet (seçiniz)</option>
           <option value="Erkek">Erkek</option>

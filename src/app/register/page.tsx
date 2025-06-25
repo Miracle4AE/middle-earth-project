@@ -13,6 +13,9 @@ export default function RegisterPage() {
     firstName: "",
     lastName: "",
     birthDate: "",
+    birthDay: "",
+    birthMonth: "",
+    birthYear: "",
     gender: "",
     phone: "",
     email: "",
@@ -23,7 +26,18 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let updatedForm = { ...form, [name]: value };
+    if (
+      (name === "birthDay" || name === "birthMonth" || name === "birthYear") &&
+      (updatedForm.birthDay && updatedForm.birthMonth && updatedForm.birthYear)
+    ) {
+      // GG.AA.YYYY formatında birleştir
+      const gun = String(updatedForm.birthDay).padStart(2, "0");
+      const ay = String(updatedForm.birthMonth).padStart(2, "0");
+      updatedForm.birthDate = `${gun}.${ay}.${updatedForm.birthYear}`;
+    }
+    setForm(updatedForm);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -126,14 +140,29 @@ export default function RegisterPage() {
           required
         />
         <label className="text-yellow-200 text-sm">Doğum Tarihi</label>
-        <input 
-          type="date"
-          name="birthDate"
-          value={form.birthDate} 
-          onChange={handleChange} 
-          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
-          required
-        />
+        <div className="flex gap-2">
+          <select name="birthDay" value={form.birthDay || ""} onChange={handleChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required>
+            <option value="">Gün</option>
+            {[...Array(31)].map((_, i) => (
+              <option key={i+1} value={i+1}>{i+1}</option>
+            ))}
+          </select>
+          <select name="birthMonth" value={form.birthMonth || ""} onChange={handleChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required>
+            <option value="">Ay</option>
+            {[
+              "Ocak","Şubat","Mart","Nisan","Mayıs","Haziran",
+              "Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"
+            ].map((ay, i) => (
+              <option key={i+1} value={i+1}>{ay}</option>
+            ))}
+          </select>
+          <select name="birthYear" value={form.birthYear || ""} onChange={handleChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required>
+            <option value="">Yıl</option>
+            {Array.from({length: 2025-1900+1}, (_, i) => 1900+i).map(yil => (
+              <option key={yil} value={yil}>{yil}</option>
+            ))}
+          </select>
+        </div>
         <select 
           name="gender"
           value={form.gender} 
