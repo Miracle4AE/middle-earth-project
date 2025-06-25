@@ -31,9 +31,6 @@ export default function Home() {
         return;
       }
 
-      const total = parseInt(contentLength, 10);
-      let loaded = 0;
-
       const reader = response.body.getReader();
       const stream = new ReadableStream({
         start(controller) {
@@ -43,7 +40,6 @@ export default function Home() {
                 controller.close();
                 return;
               }
-              loaded += value.length;
               controller.enqueue(value);
               push();
             });
