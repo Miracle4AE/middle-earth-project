@@ -9,7 +9,6 @@ const MotionLink = motion(Link);
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [videoSrc, setVideoSrc] = useState("");
 
@@ -45,7 +44,6 @@ export default function Home() {
                 return;
               }
               loaded += value.length;
-              setLoadingProgress((loaded / total) * 100);
               controller.enqueue(value);
               push();
             });
