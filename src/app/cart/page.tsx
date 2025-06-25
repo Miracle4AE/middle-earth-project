@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
 
@@ -8,6 +9,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const c: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
@@ -53,10 +55,7 @@ export default function CartPage() {
   };
 
   const handleBuy = () => {
-    setMessage("Satın alma işlemi başarıyla tamamlandı! (Tabii ki şaka :) )");
-    localStorage.removeItem("lotr-cart");
-    setCart([]);
-    setTotal(0);
+    router.push("/checkout");
   };
 
   return (
