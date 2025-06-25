@@ -156,27 +156,27 @@ export default function CharactersPage() {
   const evilChars = characters.filter((c) => c.type === "evil");
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="relative flex flex-col items-center justify-center min-h-screen text-white overflow-hidden">
-        {/* Arka plan yüzük görseli */}
+    <div className="relative min-h-screen w-full">
+      {/* Sabit arka plan yüzük görseli */}
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
         <Image
           src="/images/one-ring.png"
           alt="One Ring"
-          layout="fill"
-          objectFit="contain"
-          className="opacity-25 z-0 pointer-events-none"
-          style={{
-            filter: "drop-shadow(0 0 80px gold) blur(2px)"
-          }}
+          fill
+          style={{ objectFit: "contain", opacity: 0.18, filter: "drop-shadow(0 0 80px gold) blur(2px)" }}
           priority
         />
-        <h1 className="font-[Ringbearer] text-5xl md:text-7xl font-extrabold mb-12 text-yellow-400 drop-shadow-[0_0_20px_gold] text-center z-10">Karakterler</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-6xl px-4 z-10">
+      </div>
+      {/* Karakterler içeriği */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative flex flex-col items-center justify-center min-h-screen text-white overflow-hidden z-10"
+      >
+        <h1 className="font-[Ringbearer] text-5xl md:text-7xl font-extrabold mb-12 text-yellow-400 drop-shadow-[0_0_20px_gold] text-center">Karakterler</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-6xl px-4">
           {/* İyi karakterler sol sütun */}
           <div className="flex flex-col gap-12">
             <h2 className="font-[Ringbearer] text-3xl md:text-4xl text-yellow-300 mb-1 text-center drop-shadow-[0_0_10px_gold]">İyi Karakterler</h2>
@@ -199,9 +199,8 @@ export default function CharactersPage() {
                     className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
                   />
                 </div>
-                <h3 className="font-[Ringbearer] text-2xl md:text-3xl text-yellow-300 mb-2 drop-shadow-[0_0_10px_gold]">{char.name}</h3>
+                <h3 className="font-[Ringbearer] text-2xl md:text-3xl text-yellow-300 mb-2 drop-shadow-[0_0_10px_gold] text-center">{char.name}</h3>
                 <p className="text-gray-200 text-center text-base md:text-lg">{char.desc}</p>
-                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60 transition-opacity duration-500 bg-gradient-to-br from-yellow-400 via-yellow-100 to-transparent blur-sm" />
               </motion.div>
             ))}
           </div>
@@ -227,14 +226,13 @@ export default function CharactersPage() {
                     className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
                   />
                 </div>
-                <h3 className="font-[Ringbearer] text-2xl md:text-3xl text-red-400 mb-2 drop-shadow-[0_0_10px_red]">{char.name}</h3>
+                <h3 className="font-[Ringbearer] text-2xl md:text-3xl text-red-400 mb-2 drop-shadow-[0_0_10px_red] text-center">{char.name}</h3>
                 <p className="text-gray-200 text-center text-base md:text-lg">{char.desc}</p>
-                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60 transition-opacity duration-500 bg-gradient-to-br from-red-400 via-red-100 to-transparent blur-sm" />
               </motion.div>
             ))}
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 } 
