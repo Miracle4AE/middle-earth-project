@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 import { useAuth } from "../AuthContext";
+import { useRouter } from "next/navigation";
 
 const categories = [
   { name: "Yüzükler" },
@@ -142,6 +143,7 @@ const initialProducts: Record<string, Product[]> = {
 
 export default function ShopPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [selected, setSelected] = useState(categories[0].name);
   const [products] = useState<Record<string, Product[]>>(initialProducts);
   const currentProducts = products[selected] || [];
@@ -191,6 +193,24 @@ export default function ShopPage() {
         transition: { duration: 0.7, ease: "easeInOut" }
       }).then(() => setFlyingImg(null));
     }
+  };
+
+  const handleBuyNow = (product: Product) => {
+    if (!user) {
+      alert("Satın almak için giriş yapmalısın!");
+      return;
+    }
+    const cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+    const existingIndex = cart.findIndex(
+      (item) => item.name === product.name && item.category === selected
+    );
+    if (existingIndex !== -1) {
+      cart[existingIndex].quantity += 1;
+    } else {
+      cart.push({ ...product, category: selected, quantity: 1 });
+    }
+    localStorage.setItem("lotr-cart", JSON.stringify(cart));
+    router.push("/checkout");
   };
 
   return (
@@ -255,7 +275,7 @@ export default function ShopPage() {
                     <motion.button
                       whileHover={{ scale: 1.08, boxShadow: "0 0 30px #FFD700" }}
                       className="w-full px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black font-bold text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900 border-2 border-yellow-700 ring-2 ring-yellow-300 mt-2"
-                      onClick={() => alert("Tebrikler! Bu ürünü satın aldın (Tabii ki şaka :) )")}
+                      onClick={() => handleBuyNow(prod)}
                     >
                       Satın Al
                     </motion.button>
