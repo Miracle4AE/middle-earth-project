@@ -1,101 +1,101 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showReset, setShowReset] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetLink, setResetLink] = useState("");
-  const [showNewPass, setShowNewPass] = useState(false);
-  const [newPass, setNewPass] = useState("");
-  const [resetUser, setResetUser] = useState<{ username: string } | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const user = users.find((u: { username: string, password: unknown }) => u.username === username && u.password === password);
-    if (user) {
-      localStorage.setItem("lotr-current-user", JSON.stringify(user));
-      setMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
-      setTimeout(() => router.push("/"), 1200);
-    } else {
-      setMessage("Kullanıcı adı veya şifre yanlış!");
+    if (!email || !password) {
+      setError("Lütfen e-posta ve şifrenizi girin.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/");
+    } catch (error: any) {
+      console.error("Giriş sırasında hata:", error);
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        setError("E-posta veya şifre yanlış.");
+      } else {
+        setError("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResetRequest = (e: React.FormEvent) => {
+  const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const user = users.find((u: { email: string, username: string }) => u.email === resetEmail);
-    if (user) {
-      setResetUser(user);
-      setResetLink("/reset-password?user=" + encodeURIComponent(user.username));
-      setMessage("");
-    } else {
-      setMessage("Bu e-posta ile kayıtlı kullanıcı bulunamadı!");
+    if (!email) {
+      setError("Lütfen şifresini sıfırlamak istediğiniz e-posta adresini girin.");
+      return;
     }
-  };
-
-  const handleNewPass = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPass || !resetUser) return;
-    const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    const idx = users.findIndex((u: { username: string }) => u.username === resetUser.username);
-    if (idx !== -1) {
-      users[idx].password = newPass;
-      localStorage.setItem("lotr-users", JSON.stringify(users));
-      setMessage("Şifre başarıyla değiştirildi! Giriş yapabilirsin.");
-      setShowNewPass(false);
-      setShowReset(false);
-      setResetLink("");
+    setLoading(true);
+    setError("");
+    setMessage("");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage("Şifre sıfırlama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.");
+    } catch (error: any) {
+      console.error("Şifre sıfırlama sırasında hata:", error);
+       if (error.code === 'auth/user-not-found') {
+        setError("Bu e-posta adresi ile kayıtlı bir kullanıcı bulunamadı.");
+      } else {
+        setError("Şifre sıfırlama e-postası gönderilirken bir hata oluştu.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8">
-      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">Giriş Yap</h1>
-      {!showReset && !showNewPass && (
+      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">
+        {showReset ? "Şifremi Unuttum" : "Giriş Yap"}
+      </h1>
+      
+      {!showReset ? (
         <>
           <form onSubmit={handleLogin} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
-            <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Kullanıcı Adı" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="E-posta" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Şifre" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-            <button type="submit" className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition">Giriş Yap</button>
-            {message && <div className="text-green-400 font-bold text-center mt-2">{message}</div>}
+            <button type="submit" disabled={loading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">
+              {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
+            </button>
+            {error && <p className="text-red-500 text-center mt-2">{error}</p>}
           </form>
           <div className="text-yellow-200 mt-8 text-center max-w-xl">
-            Hesabın yok mu? <a href="/register" className="underline text-yellow-400">Kayıt Ol</a>
+            Hesabın yok mu? <Link href="/register" className="underline text-yellow-400">Kayıt Ol</Link>
             <br />
-            <button onClick={() => setShowReset(true)} className="mt-4 underline text-yellow-400">Şifremi Unuttum</button>
+            <button onClick={() => { setShowReset(true); setError(''); }} className="mt-4 underline text-yellow-400">Şifremi Unuttum</button>
           </div>
         </>
-      )}
-      {showReset && !showNewPass && (
-        <form onSubmit={handleResetRequest} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md mt-4">
-          <label className="text-yellow-300 font-bold">Kayıtlı E-posta Adresin
-            <input value={resetEmail} onChange={e => setResetEmail(e.target.value)} placeholder="E-posta" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100 mt-1" />
-          </label>
-          <button type="submit" className="bg-yellow-400 text-black font-bold py-2 rounded hover:bg-yellow-500 transition">Şifre Sıfırlama Linki Gönder</button>
-          {message && <div className="text-red-400 font-bold text-center mt-2">{message}</div>}
-          {resetLink && (
-            <div className="text-green-400 font-bold text-center mt-4">
-              Şifre sıfırlama linkin hazır: <br />
-              <button className="underline" onClick={() => { setShowNewPass(true); setShowReset(false); }}>Şifreyi Sıfırla</button>
-            </div>
-          )}
-          <button type="button" onClick={() => { setShowReset(false); setMessage(""); setResetLink(""); }} className="text-yellow-400 underline mt-2">Geri Dön</button>
-        </form>
-      )}
-      {showNewPass && (
-        <form onSubmit={handleNewPass} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md mt-4">
-          <label className="text-yellow-300 font-bold">Yeni Şifre
-            <input type="password" value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Yeni Şifre" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100 mt-1" />
-          </label>
-          <button type="submit" className="bg-yellow-400 text-black font-bold py-2 rounded hover:bg-yellow-500 transition">Şifreyi Kaydet</button>
-        </form>
+      ) : (
+        <>
+          <form onSubmit={handlePasswordReset} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
+            <p className="text-yellow-200 text-sm mb-2">Kayıtlı e-posta adresinize bir sıfırlama bağlantısı göndereceğiz.</p>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="E-posta" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+            <button type="submit" disabled={loading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">
+              {loading ? "Gönderiliyor..." : "Sıfırlama Linki Gönder"}
+            </button>
+            {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+            {message && <p className="text-green-500 text-center mt-2">{message}</p>}
+          </form>
+          <button onClick={() => { setShowReset(false); setError(''); setMessage(''); }} className="mt-6 underline text-yellow-400">Giriş Yapmaya Geri Dön</button>
+        </>
       )}
     </div>
   );

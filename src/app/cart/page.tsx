@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-type CartItem = { name: string; category: string; price: string };
+type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
 
 export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -9,15 +9,47 @@ export default function CartPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const c = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+    const c: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     setCart(c);
     let t = 0;
     c.forEach((item: CartItem) => {
       const price = parseInt(item.price.replace(/[^0-9]/g, ""));
-      t += price;
+      t += price * item.quantity;
     });
     setTotal(t);
   }, []);
+
+  const updateCart = (newCart: CartItem[]) => {
+    setCart(newCart);
+    localStorage.setItem("lotr-cart", JSON.stringify(newCart));
+    let t = 0;
+    newCart.forEach((item: CartItem) => {
+      const price = parseInt(item.price.replace(/[^0-9]/g, ""));
+      t += price * item.quantity;
+    });
+    setTotal(t);
+  };
+
+  const handleIncrease = (index: number) => {
+    const newCart = [...cart];
+    newCart[index].quantity += 1;
+    updateCart(newCart);
+  };
+
+  const handleDecrease = (index: number) => {
+    const newCart = [...cart];
+    if (newCart[index].quantity > 1) {
+      newCart[index].quantity -= 1;
+      updateCart(newCart);
+    } else {
+      handleRemove(index);
+    }
+  };
+
+  const handleRemove = (index: number) => {
+    const newCart = cart.filter((_, i) => i !== index);
+    updateCart(newCart);
+  };
 
   const handleBuy = () => {
     setMessage("Satın alma işlemi başarıyla tamamlandı! (Tabii ki şaka :) )");
@@ -39,14 +71,27 @@ export default function CartPage() {
                 <th className="p-2">Ürün</th>
                 <th className="p-2">Kategori</th>
                 <th className="p-2">Fiyat</th>
+                <th className="p-2">Adet</th>
+                <th className="p-2">İşlem</th>
               </tr>
             </thead>
             <tbody>
               {cart.map((item, i) => (
                 <tr key={i} className="border-b border-yellow-800">
-                  <td className="p-2">{item.name}</td>
+                  <td className="p-2 flex items-center gap-2">
+                    <img src={item.img} alt={item.name} className="w-12 h-12 object-contain rounded" />
+                    <span>{item.name}</span>
+                  </td>
                   <td className="p-2">{item.category}</td>
                   <td className="p-2">{item.price}</td>
+                  <td className="p-2 flex items-center gap-2">
+                    <button onClick={() => handleDecrease(i)} className="bg-yellow-400 text-black px-2 rounded font-bold">-</button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => handleIncrease(i)} className="bg-yellow-400 text-black px-2 rounded font-bold">+</button>
+                  </td>
+                  <td className="p-2">
+                    <button onClick={() => handleRemove(i)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition">Sepetten Çıkart</button>
+                  </td>
                 </tr>
               ))}
             </tbody>

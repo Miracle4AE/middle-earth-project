@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 
 const categories = [
@@ -32,6 +32,7 @@ const categories = [
 ];
 
 type Product = { name: string; price: string; img: string; desc: string };
+type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
 
 const initialProducts: Record<string, Product[]> = {
   "Yüzükler": [
@@ -145,6 +146,10 @@ export default function ShopPage() {
   const gridRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
   const [user, setUser] = useState<{ username: string } | null>(null);
+  const cartIconRef = useRef<HTMLButtonElement>(null);
+  const [flyingImg, setFlyingImg] = useState<{ img: string; from: DOMRect; to: DOMRect } | null>(null);
+  const controls = useAnimation();
+  const imgRefs = useRef<(HTMLImageElement | null)[]>([]);
 
   useEffect(() => {
     if (firstRender.current) {
@@ -161,15 +166,35 @@ export default function ShopPage() {
     setUser(u ? JSON.parse(u) : null);
   }, []);
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, imgRef: React.RefObject<HTMLImageElement | null>) => {
     if (!user) {
       alert("Sepete eklemek için giriş yapmalısın!");
       return;
     }
-    const cart = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
-    cart.push({ ...product, category: selected });
+    if (!imgRef.current) return;
+    let cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+    const existingIndex = cart.findIndex(
+      (item) => item.name === product.name && item.category === selected
+    );
+    if (existingIndex !== -1) {
+      cart[existingIndex].quantity += 1;
+    } else {
+      cart.push({ ...product, category: selected, quantity: 1 });
+    }
     localStorage.setItem("lotr-cart", JSON.stringify(cart));
-    alert("Ürün sepete eklendi!");
+    // Animasyon başlat
+    if (imgRef.current && cartIconRef.current) {
+      const from = imgRef.current.getBoundingClientRect();
+      const to = cartIconRef.current.getBoundingClientRect();
+      setFlyingImg({ img: product.img, from, to });
+      controls.start({
+        x: to.left - from.left,
+        y: to.top - from.top,
+        scale: 0.2,
+        opacity: 0.7,
+        transition: { duration: 0.7, ease: "easeInOut" }
+      }).then(() => setFlyingImg(null));
+    }
   };
 
   return (
@@ -202,46 +227,66 @@ export default function ShopPage() {
             {currentProducts.length === 0 ? (
               <div className="text-gray-300 text-center col-span-2">Bu kategoriye ait ürünler yakında eklenecek!</div>
             ) : (
-              currentProducts.map((prod: Product, i: number) => (
-                <motion.div
-                  key={prod.name}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.6, delay: i * 0.08 }}
-                  className="bg-black/70 rounded-2xl border-2 border-yellow-700 shadow-xl flex flex-col items-center p-6 hover:scale-105 hover:shadow-yellow-400/30 hover:border-yellow-400 transition-all duration-300 group relative overflow-hidden"
-                >
-                  <Image
-                    src={prod.img}
-                    alt={prod.name}
-                    width={200}
-                    height={200}
-                    className="w-40 h-40 object-contain mb-4"
-                  />
-                  <h3 className="font-[Ringbearer] text-2xl text-yellow-300 mb-2 drop-shadow-[0_0_10px_gold]">{prod.name}</h3>
-                  <p className="text-gray-200 text-center text-base mb-2">{prod.desc}</p>
-                  <span className="text-xl font-bold text-yellow-400 drop-shadow-[0_0_10px_gold] mb-2">{prod.price}</span>
-                  <motion.button
-                    whileHover={user ? { scale: 1.08, boxShadow: "0 0 30px #FFD700" } : {}}
-                    className={`w-full px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black font-bold text-lg shadow-lg transition-all duration-300 border-2 border-yellow-700 ring-2 ring-yellow-300 ${user ? "hover:bg-yellow-400 hover:text-gray-900 cursor-pointer" : "opacity-50 cursor-not-allowed"}`}
-                    onClick={() => handleAddToCart(prod)}
-                    disabled={!user}
+              currentProducts.map((prod: Product, i: number) => {
+                return (
+                  <motion.div
+                    key={prod.name}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.6, delay: i * 0.08 }}
+                    className="bg-black/70 rounded-2xl border-2 border-yellow-700 shadow-xl flex flex-col items-center p-6 hover:scale-105 hover:shadow-yellow-400/30 hover:border-yellow-400 transition-all duration-300 group relative overflow-hidden"
                   >
-                    Sepete Ekle
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.08, boxShadow: "0 0 30px #FFD700" }}
-                    className="w-full px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black font-bold text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900 border-2 border-yellow-700 ring-2 ring-yellow-300 mt-2"
-                    onClick={() => alert("Tebrikler! Bu ürünü satın aldın (Tabii ki şaka :) )")}
-                  >
-                    Satın Al
-                  </motion.button>
-                </motion.div>
-              ))
+                    <img
+                      ref={el => { imgRefs.current[i] = el!; }}
+                      src={prod.img}
+                      alt={prod.name}
+                      width={200}
+                      height={200}
+                      className="w-40 h-40 object-contain mb-4"
+                    />
+                    <h3 className="font-[Ringbearer] text-2xl text-yellow-300 mb-2 drop-shadow-[0_0_10px_gold]">{prod.name}</h3>
+                    <p className="text-gray-200 text-center text-base mb-2">{prod.desc}</p>
+                    <span className="text-xl font-bold text-yellow-400 drop-shadow-[0_0_10px_gold] mb-2">{prod.price}</span>
+                    <motion.button
+                      whileHover={user ? { scale: 1.08, boxShadow: "0 0 30px #FFD700" } : {}}
+                      className={`w-full px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black font-bold text-lg shadow-lg transition-all duration-300 border-2 border-yellow-700 ring-2 ring-yellow-300 ${user ? "hover:bg-yellow-400 hover:text-gray-900 cursor-pointer" : "opacity-50 cursor-not-allowed"}`}
+                      onClick={() => handleAddToCart(prod, { current: imgRefs.current[i] })}
+                      disabled={!user}
+                    >
+                      Sepete Ekle
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.08, boxShadow: "0 0 30px #FFD700" }}
+                      className="w-full px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black font-bold text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900 border-2 border-yellow-700 ring-2 ring-yellow-300 mt-2"
+                      onClick={() => alert("Tebrikler! Bu ürünü satın aldın (Tabii ki şaka :) )")}
+                    >
+                      Satın Al
+                    </motion.button>
+                  </motion.div>
+                );
+              })
             )}
           </div>
         </div>
       </div>
+      {flyingImg && (
+        <motion.img
+          src={flyingImg.img}
+          initial={{
+            position: "fixed",
+            left: flyingImg.from.left,
+            top: flyingImg.from.top,
+            width: flyingImg.from.width,
+            height: flyingImg.from.height,
+            zIndex: 9999,
+            borderRadius: 12,
+            boxShadow: "0 0 20px #FFD700"
+          }}
+          animate={controls}
+          style={{ position: "fixed", left: flyingImg.from.left, top: flyingImg.from.top }}
+        />
+      )}
     </motion.div>
   );
 } 

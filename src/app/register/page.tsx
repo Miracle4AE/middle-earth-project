@@ -1,54 +1,193 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    name: "",
-    surname: "",
+    displayName: "",
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    gender: "",
+    phone: "",
     email: "",
-    address: "",
-    username: "",
-    password: ""
+    password: "",
+    confirmPassword: ""
   });
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (Object.values(form).some(v => !v)) {
-      setMessage("Lütfen tüm alanları doldurun!");
+    
+    // Validasyon
+    if (!form.displayName || !form.firstName || !form.lastName || !form.birthDate || 
+        !form.gender || !form.phone || !form.email || !form.password || !form.confirmPassword) {
+      setError("Lütfen tüm alanları doldurun.");
       return;
     }
-    // Kullanıcıları localStorage'da sakla
-    const users = JSON.parse(localStorage.getItem("lotr-users") || "[]");
-    if (users.find((u: { username: string }) => u.username === form.username)) {
-      setMessage("Bu kullanıcı adı zaten alınmış!");
+    
+    if (form.password.length < 6) {
+      setError("Şifre en az 6 karakter olmalıdır.");
       return;
     }
-    users.push(form);
-    localStorage.setItem("lotr-users", JSON.stringify(users));
-    setMessage("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
-    setTimeout(() => router.push("/login"), 1500);
+    
+    if (form.password !== form.confirmPassword) {
+      setError("Şifreler eşleşmiyor.");
+      return;
+    }
+
+    // Email formatı kontrolü
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError("Geçerli bir e-posta adresi girin.");
+      return;
+    }
+
+    // Telefon formatı kontrolü (basit)
+    const phoneRegex = /^[0-9\s\-\+\(\)]{10,}$/;
+    if (!phoneRegex.test(form.phone)) {
+      setError("Geçerli bir telefon numarası girin.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      const user = userCredential.user;
+
+      // Firebase Authentication profilini güncelle (görünen ad için)
+      await updateProfile(user, { displayName: form.displayName });
+
+      // Firestore'a kullanıcı verilerini kaydet
+      await setDoc(doc(db, "profiles", user.uid), {
+        uid: user.uid,
+        displayName: form.displayName,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        birthDate: form.birthDate,
+        gender: form.gender,
+        phone: form.phone,
+        email: form.email,
+        createdAt: new Date(),
+      });
+
+      router.push("/");
+    } catch (error: any) {
+      console.error("Kayıt sırasında hata:", error);
+      if (error.code === 'auth/email-already-in-use') {
+        setError("Bu e-posta adresi zaten kullanılıyor.");
+      } else {
+        setError("Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8">
       <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">Üyelik Oluştur</h1>
-      <form onSubmit={handleSubmit} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Ad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-        <input name="surname" value={form.surname} onChange={handleChange} placeholder="Soyad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-        <input name="email" value={form.email} onChange={handleChange} placeholder="E-posta" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-        <input name="address" value={form.address} onChange={handleChange} placeholder="Adres" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-        <input name="username" value={form.username} onChange={handleChange} placeholder="Kullanıcı Adı" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-        <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Şifre" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-        <button type="submit" className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition">Kayıt Ol</button>
-        {message && <div className="text-green-400 font-bold text-center mt-2">{message}</div>}
+      <form onSubmit={handleRegister} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
+        <input 
+          name="displayName"
+          value={form.displayName} 
+          onChange={handleChange} 
+          placeholder="Görünecek İsim" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <input 
+          name="firstName"
+          value={form.firstName} 
+          onChange={handleChange} 
+          placeholder="İsim" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <input 
+          name="lastName"
+          value={form.lastName} 
+          onChange={handleChange} 
+          placeholder="Soyisim" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <label className="text-yellow-200 text-sm">Doğum Tarihi</label>
+        <input 
+          type="date"
+          name="birthDate"
+          value={form.birthDate} 
+          onChange={handleChange} 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <select 
+          name="gender"
+          value={form.gender} 
+          onChange={handleChange} 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100"
+          required
+        >
+          <option value="">Cinsiyet (seçiniz)</option>
+          <option value="Erkek">Erkek</option>
+          <option value="Kadın">Kadın</option>
+          <option value="Diğer">Diğer</option>
+        </select>
+        <input 
+          name="phone"
+          value={form.phone} 
+          onChange={handleChange} 
+          placeholder="Telefon Numarası" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <input 
+          type="email"
+          name="email"
+          value={form.email} 
+          onChange={handleChange} 
+          placeholder="Mail Adresi" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <input 
+          type="password" 
+          name="password"
+          value={form.password} 
+          onChange={handleChange} 
+          placeholder="Şifre (en az 6 karakter)" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <input 
+          type="password" 
+          name="confirmPassword"
+          value={form.confirmPassword} 
+          onChange={handleChange} 
+          placeholder="Şifre Doğrulama" 
+          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" 
+          required
+        />
+        <button type="submit" disabled={loading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">
+          {loading ? "Kaydediliyor..." : "Kayıt Ol"}
+        </button>
+        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
       </form>
+      <div className="text-yellow-200 mt-8 text-center max-w-xl">
+        Zaten bir hesabın var mı? <Link href="/login" className="underline text-yellow-400">Giriş Yap</Link>
+      </div>
     </div>
   );
 } 
