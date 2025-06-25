@@ -6,6 +6,14 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 
+interface Address {
+  title: string;
+  country: string;
+  city: string;
+  district: string;
+  address: string;
+}
+
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -25,9 +33,9 @@ export default function ProfilePage() {
   const [error, setError] = useState("");
 
   // Şifre Değişikliği
+  const [passwordStep, setPasswordStep] = useState(0); // 0: mevcut şifre, 1: yeni şifre
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [passwordStep, setPasswordStep] = useState(0); // 0: mevcut şifre, 1: yeni şifre
   const [passwordMsg, setPasswordMsg] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -38,7 +46,7 @@ export default function ProfilePage() {
   const [prefsLoading, setPrefsLoading] = useState(false);
 
   // Adreslerim
-  const [addresses, setAddresses] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressForm, setAddressForm] = useState({
     title: "",
     country: "Türkiye",
@@ -113,35 +121,6 @@ export default function ProfilePage() {
       fetchAddresses();
     }
   }, [user, loading, router]);
-
-  // Üyelik Bilgilerim
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setSuccess("");
-    setError("");
-    if (!user) {
-      setError("Kullanıcı bulunamadı.");
-      setSaving(false);
-      return;
-    }
-    try {
-      if (!form.firstName || !form.lastName || !form.phone || !form.email) {
-        setError("Ad, Soyad, Telefon ve Mail zorunludur.");
-        setSaving(false);
-        return;
-      }
-      await setDoc(doc(db, "profiles", user.uid), { ...form }, { merge: true });
-      setSuccess("Bilgiler güncellendi!");
-    } catch (err) {
-      setError("Bir hata oluştu. Lütfen tekrar dene.");
-    } finally {
-      setSaving(false);
-    }
-  };
 
   // Şifre Değişikliği
   const handlePasswordCheck = async (e: React.FormEvent) => {
@@ -325,7 +304,7 @@ export default function ProfilePage() {
           </select>
           <input name="phone" value={form.phone} readOnly placeholder="Telefon Numarası" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
           <input name="email" value={form.email} readOnly placeholder="Mail Adresi" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-          <div className="text-yellow-400 text-center text-sm mt-2">Bilgiler sadece ilk kayıt sırasında doldurulabilir. Güncellemek için "Bilgilerimi Güncelle" sekmesini kullan.</div>
+          <div className="text-yellow-400 text-center text-sm mt-2">Bilgiler sadece ilk kayıt sırasında doldurulabilir. Güncellemek için &quot;Bilgilerimi Güncelle&quot; sekmesini kullan.</div>
         </div>
       )}
       {activeTab === "addresses" && (

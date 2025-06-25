@@ -5,10 +5,22 @@ import { useRouter } from "next/navigation";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+interface Offer {
+  id: string;
+  title: string;
+  description: string;
+  discount?: string;
+  expiry?: string;
+  code?: string;
+  type: string;
+  minAmount?: number;
+  category?: string;
+}
+
 export default function OffersPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [offers, setOffers] = useState<any[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
 
   useEffect(() => {
@@ -22,7 +34,7 @@ export default function OffersPage() {
         try {
           const q = query(collection(db, "offers"), where("userId", "==", user.uid));
           const querySnapshot = await getDocs(q);
-          const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
           
           // Eğer hiç fırsat yoksa örnek fırsatlar göster
           if (data.length === 0) {
@@ -157,7 +169,7 @@ export default function OffersPage() {
                 </button>
                 {offer.code && (
                   <button 
-                    onClick={() => navigator.clipboard.writeText(offer.code)}
+                    onClick={() => offer.code && navigator.clipboard.writeText(offer.code)}
                     className="bg-black border border-yellow-400 text-yellow-400 font-bold py-2 px-4 rounded hover:bg-yellow-400 hover:text-black transition"
                   >
                     Kodu Kopyala

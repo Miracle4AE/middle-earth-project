@@ -172,7 +172,7 @@ export default function ShopPage() {
       return;
     }
     if (!imgRef.current) return;
-    let cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+    const cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     const existingIndex = cart.findIndex(
       (item) => item.name === product.name && item.category === selected
     );
@@ -237,7 +237,7 @@ export default function ShopPage() {
                     transition={{ duration: 0.6, delay: i * 0.08 }}
                     className="bg-black/70 rounded-2xl border-2 border-yellow-700 shadow-xl flex flex-col items-center p-6 hover:scale-105 hover:shadow-yellow-400/30 hover:border-yellow-400 transition-all duration-300 group relative overflow-hidden"
                   >
-                    <img
+                    <Image
                       ref={el => { imgRefs.current[i] = el!; }}
                       src={prod.img}
                       alt={prod.name}

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Link from "next/link";
 
@@ -25,9 +25,10 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Giriş sırasında hata:", error);
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      const authError = error as AuthError;
+      if (authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password' || authError.code === 'auth/invalid-credential') {
         setError("E-posta veya şifre yanlış.");
       } else {
         setError("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.");
@@ -49,9 +50,10 @@ export default function LoginPage() {
     try {
       await sendPasswordResetEmail(auth, email);
       setMessage("Şifre sıfırlama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Şifre sıfırlama sırasında hata:", error);
-       if (error.code === 'auth/user-not-found') {
+      const authError = error as AuthError;
+      if (authError.code === 'auth/user-not-found') {
         setError("Bu e-posta adresi ile kayıtlı bir kullanıcı bulunamadı.");
       } else {
         setError("Şifre sıfırlama e-postası gönderilirken bir hata oluştu.");

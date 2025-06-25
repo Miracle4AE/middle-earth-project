@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
 
@@ -79,7 +80,7 @@ export default function CartPage() {
               {cart.map((item, i) => (
                 <tr key={i} className="border-b border-yellow-800">
                   <td className="p-2 flex items-center gap-2">
-                    <img src={item.img} alt={item.name} className="w-12 h-12 object-contain rounded" />
+                    <Image src={item.img} alt={item.name} width={48} height={48} className="object-contain rounded" />
                     <span>{item.name}</span>
                   </td>
                   <td className="p-2">{item.category}</td>

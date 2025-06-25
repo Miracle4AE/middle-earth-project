@@ -69,7 +69,7 @@ export default function ProfileInfoPage() {
       }
       await setDoc(doc(db, "profiles", user.uid), form, { merge: true });
       setSuccess("Bilgiler güncellendi!");
-    } catch (err) {
+    } catch {
       setError("Bir hata oluştu. Lütfen tekrar dene.");
     } finally {
       setSaving(false);

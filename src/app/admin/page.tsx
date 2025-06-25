@@ -6,13 +6,75 @@ import { db } from "@/lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
+// Interface tanımlamaları
+interface User {
+  id: string;
+  displayName?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  address?: string;
+  createdAt?: unknown;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  price: string;
+  category: string;
+  description: string;
+  image: string;
+  stock: string;
+  createdAt?: unknown;
+}
+
+interface Order {
+  id: string;
+  userId: string;
+  userName: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  total: number;
+  status: string;
+  address: string;
+  createdAt?: unknown;
+}
+
+interface Offer {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  discount: string;
+  code: string;
+  expiry: string;
+  minAmount: string;
+  targetType: string;
+  targetUser?: string;
+  createdAt?: unknown;
+}
+
+interface Request {
+  id: string;
+  userId: string;
+  userName: string;
+  category: string;
+  subject: string;
+  message: string;
+  priority: string;
+  status?: string;
+  createdAt?: unknown;
+}
+
 export default function AdminPage() {
-  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Dashboard verileri
@@ -24,11 +86,11 @@ export default function AdminPage() {
   });
 
   // Kullanıcı yönetimi
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
   // Ürün yönetimi
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [productForm, setProductForm] = useState({
     name: "",
@@ -40,11 +102,11 @@ export default function AdminPage() {
   });
 
   // Sipariş yönetimi
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
 
   // Fırsat yönetimi
-  const [offers, setOffers] = useState<any[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(false);
   const [offerForm, setOfferForm] = useState({
     title: "",
@@ -59,7 +121,7 @@ export default function AdminPage() {
   });
 
   // Soru/Talep yönetimi
-  const [requests, setRequests] = useState<any[]>([]);
+  const [requests, setRequests] = useState<Request[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
 
   // Toplu fırsat yönetimi
@@ -88,12 +150,10 @@ export default function AdminPage() {
 
   // Dashboard verilerini yükle
   const loadDashboardStats = async () => {
-    setLoading(true);
     try {
       const usersSnapshot = await getDocs(collection(db, "profiles"));
       const ordersSnapshot = await getDocs(collection(db, "orders"));
       const productsSnapshot = await getDocs(collection(db, "products"));
-      const requestsSnapshot = await getDocs(collection(db, "requests"));
 
       let totalRevenue = 0;
       ordersSnapshot.forEach(doc => {
@@ -109,80 +169,63 @@ export default function AdminPage() {
       });
     } catch (error) {
       console.error("Dashboard verileri yüklenirken hata:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   // Kullanıcıları yükle
   const loadUsers = async () => {
-    setLoadingUsers(true);
     try {
       const snapshot = await getDocs(collection(db, "profiles"));
-      const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as User[];
       setUsers(usersData);
     } catch (error) {
       console.error("Kullanıcılar yüklenirken hata:", error);
-    } finally {
-      setLoadingUsers(false);
     }
   };
 
   // Ürünleri yükle
   const loadProducts = async () => {
-    setLoadingProducts(true);
     try {
       const snapshot = await getDocs(collection(db, "products"));
-      const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
       setProducts(productsData);
     } catch (error) {
       console.error("Ürünler yüklenirken hata:", error);
-    } finally {
-      setLoadingProducts(false);
     }
   };
 
   // Siparişleri yükle
   const loadOrders = async () => {
-    setLoadingOrders(true);
     try {
       const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
-      const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
       setOrders(ordersData);
     } catch (error) {
       console.error("Siparişler yüklenirken hata:", error);
-    } finally {
-      setLoadingOrders(false);
     }
   };
 
   // Fırsatları yükle
   const loadOffers = async () => {
-    setLoadingOffers(true);
     try {
       const snapshot = await getDocs(collection(db, "offers"));
-      const offersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const offersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
       setOffers(offersData);
     } catch (error) {
       console.error("Fırsatlar yüklenirken hata:", error);
-    } finally {
-      setLoadingOffers(false);
     }
   };
 
   // Soru/Talepleri yükle
   const loadRequests = async () => {
-    setLoadingRequests(true);
     try {
       const q = query(collection(db, "requests"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
-      const requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Request[];
       setRequests(requestsData);
     } catch (error) {
       console.error("Soru/Talepler yüklenirken hata:", error);
-    } finally {
-      setLoadingRequests(false);
     }
   };
 
@@ -215,7 +258,7 @@ export default function AdminPage() {
       setProductForm({ name: "", price: "", category: "", description: "", image: "", stock: "" });
       loadProducts();
       setError("");
-    } catch (error) {
+    } catch {
       setError("Ürün eklenirken hata oluştu.");
     }
   };
@@ -244,7 +287,7 @@ export default function AdminPage() {
       });
       loadOffers();
       setError("");
-    } catch (error) {
+    } catch {
       setError("Fırsat eklenirken hata oluştu.");
     }
   };
@@ -254,7 +297,7 @@ export default function AdminPage() {
     try {
       await updateDoc(doc(db, "orders", orderId), { status });
       loadOrders();
-    } catch (error) {
+    } catch {
       setError("Sipariş durumu güncellenirken hata oluştu.");
     }
   };
@@ -265,7 +308,7 @@ export default function AdminPage() {
       try {
         await deleteDoc(doc(db, "offers", offerId));
         loadOffers();
-      } catch (error) {
+      } catch {
         setError("Fırsat silinirken hata oluştu.");
       }
     }
@@ -314,7 +357,7 @@ export default function AdminPage() {
       setBulkProgress({ current: 0, total: 0 });
       loadOffers();
       setError("");
-    } catch (error) {
+    } catch {
       setError("Toplu fırsat eklenirken hata oluştu.");
     } finally {
       setBulkLoading(false);
@@ -326,7 +369,7 @@ export default function AdminPage() {
     try {
       await sendPasswordResetEmail(auth, email);
       alert(`Şifre sıfırlama maili ${email} adresine gönderildi!`);
-    } catch (err) {
+    } catch {
       alert("Şifre sıfırlama maili gönderilemedi. Lütfen e-posta adresini kontrol et.");
     }
   };
@@ -449,11 +492,11 @@ export default function AdminPage() {
                           <td className="p-2">{user.firstName} {user.lastName}</td>
                           <td className="p-2">{user.email}</td>
                           <td className="p-2">{user.phone || "-"}</td>
-                          <td className="p-2">{user.createdAt?.toDate?.()?.toLocaleDateString() || "-"}</td>
+                          <td className="p-2">{typeof (user.createdAt as any)?.toDate === "function" ? (user.createdAt as any).toDate().toLocaleDateString() : "-"}</td>
                           <td className="p-2">
                             <button
                               className="bg-yellow-400 text-black px-3 py-1 rounded hover:bg-yellow-500 transition text-sm font-bold"
-                              onClick={() => handleResetPassword(user.email)}
+                              onClick={() => user.email && handleResetPassword(user.email)}
                             >
                               Şifreyi Sıfırla
                             </button>
@@ -587,7 +630,7 @@ export default function AdminPage() {
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-yellow-300 font-bold text-lg">Sipariş #{order.id}</h3>
-                        <p className="text-yellow-200 text-sm">Tarih: {order.createdAt?.toDate?.()?.toLocaleDateString() || "-"}</p>
+                        <p className="text-yellow-200 text-sm">Tarih: {typeof (order.createdAt as any)?.toDate === "function" ? (order.createdAt as any).toDate().toLocaleDateString() : "-"}</p>
                         <p className="text-yellow-200 text-sm">Toplam: {order.total}₺</p>
                       </div>
                       <div>
@@ -886,11 +929,9 @@ export default function AdminPage() {
                         <h3 className="text-yellow-300 font-bold text-lg">{request.subject}</h3>
                         <p className="text-yellow-200 text-sm">Kategori: {request.category}</p>
                         <p className="text-yellow-200 text-sm">Kullanıcı: {request.userName}</p>
-                        <p className="text-yellow-200 text-sm">Tarih: {request.createdAt?.toDate?.()?.toLocaleDateString() || "-"}</p>
+                        <p className="text-yellow-200 text-sm">Tarih: {typeof (request.createdAt as any)?.toDate === "function" ? (request.createdAt as any).toDate().toLocaleDateString() : "-"}</p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-white text-xs font-bold ${
-                        request.status === "Yanıtlandı" ? "bg-green-600" : "bg-yellow-600"
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-white text-xs font-bold ${request.status === "Yanıtlandı" ? "bg-green-600" : "bg-yellow-600"}`}>
                         {request.status || "Beklemede"}
                       </span>
                     </div>
@@ -914,4 +955,4 @@ export default function AdminPage() {
       </div>
     </div>
   );
-} 
+}

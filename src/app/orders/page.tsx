@@ -5,10 +5,26 @@ import { useRouter } from "next/navigation";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface Order {
+  id: string;
+  orderNumber?: string;
+  date?: string;
+  status?: string;
+  total?: number;
+  address?: string;
+  items?: OrderItem[];
+}
+
 export default function OrdersPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
   useEffect(() => {
@@ -22,7 +38,7 @@ export default function OrdersPage() {
         try {
           const q = query(collection(db, "orders"), where("userId", "==", user.uid));
           const querySnapshot = await getDocs(q);
-          const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
           
           // Eğer hiç sipariş yoksa örnek siparişler göster
           if (data.length === 0) {
@@ -93,7 +109,7 @@ export default function OrdersPage() {
                   <div className="text-yellow-300 font-bold text-lg mb-1">Sipariş #{order.orderNumber || `ORD-${i+1}`}</div>
                   <div className="text-yellow-200 text-sm">Tarih: {order.date || "Belirtilmemiş"}</div>
                 </div>
-                <div className={`font-bold text-lg ${getStatusColor(order.status)}`}>
+                <div className={`font-bold text-lg ${getStatusColor(order.status || "")}`}>
                   {order.status || "Beklemede"}
                 </div>
               </div>
@@ -114,7 +130,7 @@ export default function OrdersPage() {
                 <div className="bg-black/40 rounded-lg p-3">
                   {order.items && order.items.length > 0 ? (
                     <ul className="space-y-2">
-                      {order.items.map((item: any, j: number) => (
+                      {order.items.map((item: OrderItem, j: number) => (
                         <li key={j} className="flex justify-between items-center text-yellow-200">
                           <span>{item.name}</span>
                           <span className="text-yellow-400">x{item.quantity} - {item.price}₺</span>

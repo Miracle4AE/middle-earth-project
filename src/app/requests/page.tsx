@@ -56,7 +56,7 @@ export default function RequestsPage() {
       });
       setSuccess("Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.");
       setForm({ category: "", subject: "", message: "", priority: "normal" });
-    } catch (err) {
+    } catch {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
       setSending(false);

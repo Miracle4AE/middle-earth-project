@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, AuthError } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
@@ -84,9 +84,10 @@ export default function RegisterPage() {
       });
 
       router.push("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Kayıt sırasında hata:", error);
-      if (error.code === 'auth/email-already-in-use') {
+      const authError = error as AuthError;
+      if (authError.code === 'auth/email-already-in-use') {
         setError("Bu e-posta adresi zaten kullanılıyor.");
       } else {
         setError("Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.");
