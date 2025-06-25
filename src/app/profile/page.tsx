@@ -28,9 +28,6 @@ export default function ProfilePage() {
     phone: "",
     email: ""
   });
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
 
   // Şifre Değişikliği
   const [passwordStep, setPasswordStep] = useState(0); // 0: mevcut şifre, 1: yeni şifre

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, where, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
@@ -88,11 +87,9 @@ export default function AdminPage() {
 
   // Kullanıcı yönetimi
   const [users, setUsers] = useState<User[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
 
   // Ürün yönetimi
   const [products, setProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(false);
   const [productForm, setProductForm] = useState({
     name: "",
     price: "",
@@ -104,11 +101,9 @@ export default function AdminPage() {
 
   // Sipariş yönetimi
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(false);
 
   // Fırsat yönetimi
   const [offers, setOffers] = useState<Offer[]>([]);
-  const [loadingOffers, setLoadingOffers] = useState(false);
   const [offerForm, setOfferForm] = useState({
     title: "",
     description: "",
@@ -123,7 +118,6 @@ export default function AdminPage() {
 
   // Soru/Talep yönetimi
   const [requests, setRequests] = useState<Request[]>([]);
-  const [loadingRequests, setLoadingRequests] = useState(false);
 
   // Toplu fırsat yönetimi
   const [bulkOfferForm, setBulkOfferForm] = useState({
@@ -472,43 +466,39 @@ export default function AdminPage() {
         {activeTab === "users" && (
           <div>
             <h2 className="text-yellow-300 text-2xl font-bold mb-6">Kullanıcı Yönetimi</h2>
-            {loadingUsers ? (
-              <div className="text-yellow-200">Yükleniyor...</div>
-            ) : (
-              <div className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-yellow-200">
-                    <thead>
-                      <tr className="border-b border-yellow-700">
-                        <th className="text-left p-2">Ad Soyad</th>
-                        <th className="text-left p-2">E-posta</th>
-                        <th className="text-left p-2">Telefon</th>
-                        <th className="text-left p-2">Kayıt Tarihi</th>
-                        <th className="text-left p-2">Şifre İşlemi</th>
+            <div className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full text-yellow-200">
+                  <thead>
+                    <tr className="border-b border-yellow-700">
+                      <th className="text-left p-2">Ad Soyad</th>
+                      <th className="text-left p-2">E-posta</th>
+                      <th className="text-left p-2">Telefon</th>
+                      <th className="text-left p-2">Kayıt Tarihi</th>
+                      <th className="text-left p-2">Şifre İşlemi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id} className="border-b border-yellow-700/50">
+                        <td className="p-2">{user.firstName} {user.lastName}</td>
+                        <td className="p-2">{user.email}</td>
+                        <td className="p-2">{user.phone || "-"}</td>
+                        <td className="p-2">{user.createdAt ? user.createdAt.toDate().toLocaleDateString() : "-"}</td>
+                        <td className="p-2">
+                          <button
+                            className="bg-yellow-400 text-black px-3 py-1 rounded hover:bg-yellow-500 transition text-sm font-bold"
+                            onClick={() => user.email && handleResetPassword(user.email)}
+                          >
+                            Şifreyi Sıfırla
+                          </button>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((user) => (
-                        <tr key={user.id} className="border-b border-yellow-700/50">
-                          <td className="p-2">{user.firstName} {user.lastName}</td>
-                          <td className="p-2">{user.email}</td>
-                          <td className="p-2">{user.phone || "-"}</td>
-                          <td className="p-2">{user.createdAt ? user.createdAt.toDate().toLocaleDateString() : "-"}</td>
-                          <td className="p-2">
-                            <button
-                              className="bg-yellow-400 text-black px-3 py-1 rounded hover:bg-yellow-500 transition text-sm font-bold"
-                              onClick={() => user.email && handleResetPassword(user.email)}
-                            >
-                              Şifreyi Sıfırla
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -582,39 +572,35 @@ export default function AdminPage() {
             </div>
 
             {/* Ürün Listesi */}
-            {loadingProducts ? (
-              <div className="text-yellow-200">Yükleniyor...</div>
-            ) : (
-              <div className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-yellow-200">
-                    <thead>
-                      <tr className="border-b border-yellow-700">
-                        <th className="text-left p-2">Ürün Adı</th>
-                        <th className="text-left p-2">Kategori</th>
-                        <th className="text-left p-2">Fiyat</th>
-                        <th className="text-left p-2">Stok</th>
-                        <th className="text-left p-2">İşlemler</th>
+            <div className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full text-yellow-200">
+                  <thead>
+                    <tr className="border-b border-yellow-700">
+                      <th className="text-left p-2">Ürün Adı</th>
+                      <th className="text-left p-2">Kategori</th>
+                      <th className="text-left p-2">Fiyat</th>
+                      <th className="text-left p-2">Stok</th>
+                      <th className="text-left p-2">İşlemler</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.map((product) => (
+                      <tr key={product.id} className="border-b border-yellow-700/50">
+                        <td className="p-2">{product.name}</td>
+                        <td className="p-2">{product.category}</td>
+                        <td className="p-2">{product.price}₺</td>
+                        <td className="p-2">{product.stock || 0}</td>
+                        <td className="p-2">
+                          <button className="bg-blue-600 text-white px-2 py-1 rounded text-sm mr-2">Düzenle</button>
+                          <button className="bg-red-600 text-white px-2 py-1 rounded text-sm">Sil</button>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((product) => (
-                        <tr key={product.id} className="border-b border-yellow-700/50">
-                          <td className="p-2">{product.name}</td>
-                          <td className="p-2">{product.category}</td>
-                          <td className="p-2">{product.price}₺</td>
-                          <td className="p-2">{product.stock || 0}</td>
-                          <td className="p-2">
-                            <button className="bg-blue-600 text-white px-2 py-1 rounded text-sm mr-2">Düzenle</button>
-                            <button className="bg-red-600 text-white px-2 py-1 rounded text-sm">Sil</button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -622,40 +608,36 @@ export default function AdminPage() {
         {activeTab === "orders" && (
           <div>
             <h2 className="text-yellow-300 text-2xl font-bold mb-6">Sipariş Yönetimi</h2>
-            {loadingOrders ? (
-              <div className="text-yellow-200">Yükleniyor...</div>
-            ) : (
-              <div className="space-y-4">
-                {orders.map((order) => (
-                  <div key={order.id} className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-yellow-300 font-bold text-lg">Sipariş #{order.id}</h3>
-                        <p className="text-yellow-200 text-sm">Tarih: {order.createdAt ? order.createdAt.toDate().toLocaleDateString() : "-"}</p>
-                        <p className="text-yellow-200 text-sm">Toplam: {order.total}₺</p>
-                      </div>
-                      <div>
-                        <select 
-                          value={order.status || "Beklemede"} 
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100"
-                        >
-                          <option value="Beklemede">Beklemede</option>
-                          <option value="Hazırlanıyor">Hazırlanıyor</option>
-                          <option value="Kargoda">Kargoda</option>
-                          <option value="Teslim Edildi">Teslim Edildi</option>
-                          <option value="İptal Edildi">İptal Edildi</option>
-                        </select>
-                      </div>
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div key={order.id} className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-yellow-300 font-bold text-lg">Sipariş #{order.id}</h3>
+                      <p className="text-yellow-200 text-sm">Tarih: {order.createdAt ? order.createdAt.toDate().toLocaleDateString() : "-"}</p>
+                      <p className="text-yellow-200 text-sm">Toplam: {order.total}₺</p>
                     </div>
-                    <div className="text-yellow-200 text-sm">
-                      <p>Adres: {order.address || "-"}</p>
-                      <p>Ürünler: {order.items?.map((item: any) => `${item.name} x${item.quantity}`).join(", ") || "-"}</p>
+                    <div>
+                      <select 
+                        value={order.status || "Beklemede"} 
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                        className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100"
+                      >
+                        <option value="Beklemede">Beklemede</option>
+                        <option value="Hazırlanıyor">Hazırlanıyor</option>
+                        <option value="Kargoda">Kargoda</option>
+                        <option value="Teslim Edildi">Teslim Edildi</option>
+                        <option value="İptal Edildi">İptal Edildi</option>
+                      </select>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="text-yellow-200 text-sm">
+                    <p>Adres: {order.address || "-"}</p>
+                    <p>Ürünler: {order.items?.map((item: { name: string; quantity: number; price: number }) => `${item.name} x${item.quantity}`).join(", ") || "-"}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -755,35 +737,31 @@ export default function AdminPage() {
             </div>
 
             {/* Fırsat Listesi */}
-            {loadingOffers ? (
-              <div className="text-yellow-200">Yükleniyor...</div>
-            ) : (
-              <div className="space-y-4">
-                {offers.map((offer) => (
-                  <div key={offer.id} className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-yellow-300 font-bold text-lg">{offer.title}</h3>
-                        <p className="text-yellow-200 text-sm">{offer.description}</p>
-                        {offer.code && <p className="text-yellow-400 text-sm">Kod: {offer.code}</p>}
-                        {offer.expiry && <p className="text-yellow-400 text-sm">Son Tarih: {offer.expiry}</p>}
-                        <p className="text-yellow-200 text-xs mt-2">
-                          {offer.targetType === "ozel"
-                            ? `Kişiye Özel: ${offer.targetUser}`
-                            : "Genel (Herkese Açık)"}
-                        </p>
-                      </div>
-                      <button 
-                        onClick={() => deleteOffer(offer.id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
-                      >
-                        Sil
-                      </button>
+            <div className="space-y-4">
+              {offers.map((offer) => (
+                <div key={offer.id} className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-yellow-300 font-bold text-lg">{offer.title}</h3>
+                      <p className="text-yellow-200 text-sm">{offer.description}</p>
+                      {offer.code && <p className="text-yellow-400 text-sm">Kod: {offer.code}</p>}
+                      {offer.expiry && <p className="text-yellow-400 text-sm">Son Tarih: {offer.expiry}</p>}
+                      <p className="text-yellow-200 text-xs mt-2">
+                        {offer.targetType === "ozel"
+                          ? `Kişiye Özel: ${offer.targetUser}`
+                          : "Genel (Herkese Açık)"}
+                      </p>
                     </div>
+                    <button 
+                      onClick={() => deleteOffer(offer.id)}
+                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                    >
+                      Sil
+                    </button>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -919,38 +897,34 @@ export default function AdminPage() {
         {activeTab === "requests" && (
           <div>
             <h2 className="text-yellow-300 text-2xl font-bold mb-6">Soru/Talep Yönetimi</h2>
-            {loadingRequests ? (
-              <div className="text-yellow-200">Yükleniyor...</div>
-            ) : (
-              <div className="space-y-4">
-                {requests.map((request) => (
-                  <div key={request.id} className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-yellow-300 font-bold text-lg">{request.subject}</h3>
-                        <p className="text-yellow-200 text-sm">Kategori: {request.category}</p>
-                        <p className="text-yellow-200 text-sm">Kullanıcı: {request.userName}</p>
-                        <p className="text-yellow-200 text-sm">Tarih: {request.createdAt ? request.createdAt.toDate().toLocaleDateString() : "-"}</p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-white text-xs font-bold ${request.status === "Yanıtlandı" ? "bg-green-600" : "bg-yellow-600"}`}>
-                        {request.status || "Beklemede"}
-                      </span>
+            <div className="space-y-4">
+              {requests.map((request) => (
+                <div key={request.id} className="bg-black/80 border-2 border-yellow-700 rounded-xl p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-yellow-300 font-bold text-lg">{request.subject}</h3>
+                      <p className="text-yellow-200 text-sm">Kategori: {request.category}</p>
+                      <p className="text-yellow-200 text-sm">Kullanıcı: {request.userName}</p>
+                      <p className="text-yellow-200 text-sm">Tarih: {request.createdAt ? request.createdAt.toDate().toLocaleDateString() : "-"}</p>
                     </div>
-                    <div className="bg-black/40 rounded-lg p-3">
-                      <p className="text-yellow-200">{request.message}</p>
-                    </div>
-                    <div className="mt-4 flex gap-2">
-                      <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
-                        Yanıtla
-                      </button>
-                      <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
-                        Yanıtlandı Olarak İşaretle
-                      </button>
-                    </div>
+                    <span className={`px-3 py-1 rounded-full text-white text-xs font-bold ${request.status === "Yanıtlandı" ? "bg-green-600" : "bg-yellow-600"}`}>
+                      {request.status || "Beklemede"}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="bg-black/40 rounded-lg p-3">
+                    <p className="text-yellow-200">{request.message}</p>
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
+                      Yanıtla
+                    </button>
+                    <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                      Yanıtlandı Olarak İşaretle
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
