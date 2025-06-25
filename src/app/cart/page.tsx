@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useAuth } from "../AuthContext";
 
 type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
 
 export default function CartPage() {
+  const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
   const [message, setMessage] = useState("");

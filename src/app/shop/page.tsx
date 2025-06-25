@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import Image from "next/image";
+import { useAuth } from "../AuthContext";
 
 const categories = [
   { name: "Yüzükler" },
@@ -140,12 +141,12 @@ const initialProducts: Record<string, Product[]> = {
 };
 
 export default function ShopPage() {
+  const { user } = useAuth();
   const [selected, setSelected] = useState(categories[0].name);
   const [products] = useState<Record<string, Product[]>>(initialProducts);
   const currentProducts = products[selected] || [];
   const gridRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
-  const [user, setUser] = useState<{ username: string } | null>(null);
   const cartIconRef = useRef<HTMLButtonElement>(null);
   const [flyingImg, setFlyingImg] = useState<{ img: string; from: DOMRect; to: DOMRect } | null>(null);
   const controls = useAnimation();
@@ -160,11 +161,6 @@ export default function ShopPage() {
       gridRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [selected]);
-
-  useEffect(() => {
-    const u = localStorage.getItem("lotr-current-user");
-    setUser(u ? JSON.parse(u) : null);
-  }, []);
 
   const handleAddToCart = (product: Product, imgRef: React.RefObject<HTMLImageElement | null>) => {
     if (!user) {
