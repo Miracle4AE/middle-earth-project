@@ -11,6 +11,7 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [videoSrc, setVideoSrc] = useState("");
+  const [showOverlay, setShowOverlay] = useState(true);
 
   useEffect(() => {
     const videoUrl = "/video/lotr-intro.mp4";
@@ -57,6 +58,14 @@ export default function Home() {
     fetchVideo();
   }, []);
 
+  // Overlay'i 5 saniye sonra gizle
+  useEffect(() => {
+    if (isLoaded) {
+      const timer = setTimeout(() => setShowOverlay(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded]);
+
   const handleToggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
@@ -93,7 +102,14 @@ export default function Home() {
       >
         {isMuted ? "Sesi Aç 🔊" : "Sesi Kapat 🔇"}
       </button>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-black/60 text-white">
+      {/* Overlay: 5 saniye sonra fade out */}
+      <motion.main
+        className="flex min-h-screen flex-col items-center justify-center bg-black/60 text-white fixed inset-0 z-10"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: showOverlay ? 1 : 0 }}
+        transition={{ duration: 1 }}
+        style={{ pointerEvents: showOverlay ? 'auto' : 'none' }}
+      >
         <motion.h1
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -125,7 +141,7 @@ export default function Home() {
         >
           Yüzüğü Keşfet
         </MotionLink>
-      </main>
+      </motion.main>
     </motion.div>
   );
 }
