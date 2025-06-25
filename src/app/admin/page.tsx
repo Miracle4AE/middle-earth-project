@@ -5,6 +5,7 @@ import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp
 import { db } from "@/lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { Timestamp } from "firebase/firestore";
 
 // Interface tanımlamaları
 interface User {
@@ -15,7 +16,7 @@ interface User {
   lastName?: string;
   phone?: string;
   address?: string;
-  createdAt?: unknown;
+  createdAt?: Timestamp;
 }
 
 interface Product {
@@ -26,7 +27,7 @@ interface Product {
   description: string;
   image: string;
   stock: string;
-  createdAt?: unknown;
+  createdAt?: Timestamp;
 }
 
 interface Order {
@@ -41,7 +42,7 @@ interface Order {
   total: number;
   status: string;
   address: string;
-  createdAt?: unknown;
+  createdAt?: Timestamp;
 }
 
 interface Offer {
@@ -55,7 +56,7 @@ interface Offer {
   minAmount: string;
   targetType: string;
   targetUser?: string;
-  createdAt?: unknown;
+  createdAt?: Timestamp;
 }
 
 interface Request {
@@ -67,7 +68,7 @@ interface Request {
   message: string;
   priority: string;
   status?: string;
-  createdAt?: unknown;
+  createdAt?: Timestamp;
 }
 
 export default function AdminPage() {
@@ -492,7 +493,7 @@ export default function AdminPage() {
                           <td className="p-2">{user.firstName} {user.lastName}</td>
                           <td className="p-2">{user.email}</td>
                           <td className="p-2">{user.phone || "-"}</td>
-                          <td className="p-2">{typeof (user.createdAt as any)?.toDate === "function" ? (user.createdAt as any).toDate().toLocaleDateString() : "-"}</td>
+                          <td className="p-2">{user.createdAt ? user.createdAt.toDate().toLocaleDateString() : "-"}</td>
                           <td className="p-2">
                             <button
                               className="bg-yellow-400 text-black px-3 py-1 rounded hover:bg-yellow-500 transition text-sm font-bold"
@@ -630,7 +631,7 @@ export default function AdminPage() {
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-yellow-300 font-bold text-lg">Sipariş #{order.id}</h3>
-                        <p className="text-yellow-200 text-sm">Tarih: {typeof (order.createdAt as any)?.toDate === "function" ? (order.createdAt as any).toDate().toLocaleDateString() : "-"}</p>
+                        <p className="text-yellow-200 text-sm">Tarih: {order.createdAt ? order.createdAt.toDate().toLocaleDateString() : "-"}</p>
                         <p className="text-yellow-200 text-sm">Toplam: {order.total}₺</p>
                       </div>
                       <div>
@@ -929,7 +930,7 @@ export default function AdminPage() {
                         <h3 className="text-yellow-300 font-bold text-lg">{request.subject}</h3>
                         <p className="text-yellow-200 text-sm">Kategori: {request.category}</p>
                         <p className="text-yellow-200 text-sm">Kullanıcı: {request.userName}</p>
-                        <p className="text-yellow-200 text-sm">Tarih: {typeof (request.createdAt as any)?.toDate === "function" ? (request.createdAt as any).toDate().toLocaleDateString() : "-"}</p>
+                        <p className="text-yellow-200 text-sm">Tarih: {request.createdAt ? request.createdAt.toDate().toLocaleDateString() : "-"}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-white text-xs font-bold ${request.status === "Yanıtlandı" ? "bg-green-600" : "bg-yellow-600"}`}>
                         {request.status || "Beklemede"}
