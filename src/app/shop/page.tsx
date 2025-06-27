@@ -220,8 +220,37 @@ export default function ShopPage() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex min-h-screen bg-black/70">
-        {/* Yan Menü */}
+      <div className="flex min-h-screen bg-black/70 flex-col md:flex-row">
+        {/* Mobil Kategori Menüsü */}
+        <div className="md:hidden w-full sticky top-0 z-30 bg-black/90 border-b border-yellow-700 px-2 py-2">
+          {/* Yatay scroll */}
+          <div className="flex gap-1 overflow-x-auto pb-2 hide-scrollbar">
+            {categories.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setSelected(cat.name)}
+                className={`whitespace-nowrap font-[Ringbearer] text-xs px-3 py-2 rounded-md border-2 transition-all duration-200 shadow-md max-w-[110px] min-w-[80px] text-ellipsis overflow-hidden ${selected === cat.name ? "bg-yellow-400 text-black border-yellow-400" : "text-yellow-200 bg-black/40 border-yellow-700 hover:bg-yellow-400 hover:text-black hover:border-yellow-400"}`}
+                style={{fontWeight: 600, letterSpacing: '0.01em'}}
+                title={cat.name}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+          {/* Dropdown (isteğe bağlı, çok kategori varsa) */}
+          <div className="mt-2">
+            <select
+              value={selected}
+              onChange={e => setSelected(e.target.value)}
+              className="w-full bg-black text-yellow-300 border-2 border-yellow-700 rounded-lg px-3 py-2 font-[Ringbearer] text-base focus:outline-none focus:border-yellow-400"
+            >
+              {categories.map((cat) => (
+                <option key={cat.name} value={cat.name}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {/* Yan Menü (PC) */}
         <aside className="hidden md:flex flex-col w-64 bg-black/80 border-r-2 border-yellow-700 shadow-2xl p-6 gap-4 z-20">
           <h2 className="font-[Ringbearer] text-3xl text-yellow-400 mb-4 drop-shadow-[0_0_10px_gold] text-center">Ürünler</h2>
           <div className="flex flex-col gap-3">

@@ -13,6 +13,8 @@ export default function Home() {
   const [videoSrc, setVideoSrc] = useState("");
   const [showOverlay, setShowOverlay] = useState(true);
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   useEffect(() => {
     const videoUrl = "/video/lotr-intro.mp4";
 
@@ -75,6 +77,18 @@ export default function Home() {
     }
   };
 
+  const handleFullscreen = () => {
+    if (videoRef.current) {
+      if (videoRef.current.requestFullscreen) {
+        videoRef.current.requestFullscreen();
+      } else if ((videoRef.current as any).webkitRequestFullscreen) {
+        (videoRef.current as any).webkitRequestFullscreen();
+      } else if ((videoRef.current as any).msRequestFullscreen) {
+        (videoRef.current as any).msRequestFullscreen();
+      }
+    }
+  };
+
   if (!isLoaded) {
     return <Preloader />;
   }
@@ -86,25 +100,50 @@ export default function Home() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted={isMuted}
-        src={videoSrc}
-        className="fixed top-0 left-0 w-full h-full object-cover -z-10"
+      {/* Responsive Video Wrapper */}
+      <div
+        className="relative w-full overflow-hidden"
+        style={{
+          height: typeof window !== "undefined" && window.innerWidth < 768
+            ? "calc(100dvh - 56px)"
+            : "100vh"
+        }}
       >
-        Tarayıcınız video etiketini desteklemiyor.
-      </video>
-      <button
-        onClick={handleToggleMute}
-        className="fixed bottom-8 right-8 z-50 px-6 py-3 rounded-full bg-yellow-500 text-black font-bold shadow-lg hover:bg-yellow-400 transition-all duration-300"
-      >
-        {isMuted ? "Sesi Aç 🔊" : "Sesi Kapat 🔇"}
-      </button>
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute top-0 left-0 min-w-full min-h-full w-auto h-auto object-cover"
+          src={videoSrc}
+        >
+          Tarayıcınız video etiketini desteklemiyor.
+        </video>
+      </div>
+      {/* Mobilde ses ve tam ekran butonları */}
+      <div className="fixed bottom-4 right-4 z-50 flex gap-2 sm:bottom-8 sm:right-8">
+        <button
+          onClick={handleToggleMute}
+          className="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold shadow-lg hover:bg-yellow-400 transition-all duration-300 text-base sm:text-lg"
+        >
+          <span className="hidden sm:inline">{isMuted ? "Sesi Aç " : "Sesi Kapat "}</span>
+          {isMuted ? "🔊" : "🔇"}
+        </button>
+        {/* Sadece mobilde tam ekran butonu */}
+        {isMobile && (
+          <button
+            onClick={handleFullscreen}
+            className="px-3 py-2 rounded-full bg-yellow-500 text-black font-bold shadow-lg hover:bg-yellow-400 transition-all duration-300 text-base"
+            aria-label="Tam Ekran"
+          >
+            ⛶
+          </button>
+        )}
+      </div>
       {/* Overlay: 5 saniye sonra fade out */}
       <motion.main
-        className="flex min-h-screen flex-col items-center justify-center bg-black/60 text-white fixed inset-0 z-10"
+        className="flex min-h-screen flex-col items-center justify-center bg-black/60 text-white fixed inset-0 z-10 px-2 sm:px-8"
         initial={{ opacity: 1 }}
         animate={{ opacity: showOverlay ? 1 : 0 }}
         transition={{ duration: 1 }}
@@ -114,7 +153,7 @@ export default function Home() {
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="font-[Ringbearer] text-5xl md:text-7xl font-extrabold mb-4 text-yellow-400 drop-shadow-[0_0_20px_gold] text-center animate-pulse"
+          className="font-[Ringbearer] text-2xl sm:text-5xl md:text-7xl font-extrabold mb-2 sm:mb-4 text-yellow-400 drop-shadow-[0_0_20px_gold] text-center animate-pulse leading-tight"
         >
           The Lord of the Rings
         </motion.h1>
@@ -122,7 +161,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="text-2xl md:text-3xl font-semibold mb-6 text-gray-200 text-center"
+          className="text-base sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 text-gray-200 text-center leading-tight"
         >
           Orta Dünya&apos;ya Hoş Geldin
         </motion.h2>
@@ -130,14 +169,14 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
-          className="max-w-xl text-center mb-8 text-lg md:text-xl text-gray-300"
+          className="max-w-xl text-center mb-6 sm:mb-8 text-sm sm:text-lg md:text-xl text-gray-300 leading-relaxed px-2"
         >
           Efsanelerin, kahramanların ve yüzüğün peşindeki yolculuğun başladığı yere adım attın. Orta Dünya&apos;nın büyülü atmosferine hazır mısın?
         </motion.p>
         <MotionLink
           href="/shop"
           whileHover={{ scale: 1.1, boxShadow: "0 0 20px #FFD700" }}
-          className="px-8 py-4 rounded-full bg-yellow-500 text-black font-bold text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900"
+          className="px-6 py-3 sm:px-8 sm:py-4 rounded-full bg-yellow-500 text-black font-bold text-base sm:text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900"
         >
           Yüzüğü Keşfet
         </MotionLink>
