@@ -34,11 +34,11 @@ export default function Home() {
         return;
       }
 
-      const reader = response.body.getReader();
+      const reader: ReadableStreamDefaultReader<Uint8Array> = response.body.getReader();
       const stream = new ReadableStream({
         start(controller) {
           function push() {
-            reader.read().then(({ done, value }) => {
+            reader.read().then(({ done, value }: { done: boolean; value?: Uint8Array }) => {
               if (done) {
                 controller.close();
                 return;
