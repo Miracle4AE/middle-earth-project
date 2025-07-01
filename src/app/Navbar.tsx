@@ -16,6 +16,99 @@ export default function Navbar() {
   let menuTimeout: NodeJS.Timeout | null = null;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const [activeSection, setActiveSection] = useState('home');
+
+  // Scroll pozisyonuna göre aktif bölümü belirle
+  useEffect(() => {
+    const handleScroll = () => {
+      const charactersSection = document.getElementById('characters-section');
+      const storiesSection = document.getElementById('stories-section');
+      const gallerySection = document.getElementById('gallery-section');
+      const mapSection = document.getElementById('map-section');
+      const shopSection = document.getElementById('shop-section');
+      
+      if (charactersSection && storiesSection && gallerySection && mapSection && shopSection) {
+        const charactersRect = charactersSection.getBoundingClientRect();
+        const storiesRect = storiesSection.getBoundingClientRect();
+        const galleryRect = gallerySection.getBoundingClientRect();
+        const mapRect = mapSection.getBoundingClientRect();
+        const shopRect = shopSection.getBoundingClientRect();
+        
+        if (shopRect.top <= 100) {
+          setActiveSection('shop');
+        } else if (mapRect.top <= 100) {
+          setActiveSection('map');
+        } else if (galleryRect.top <= 100) {
+          setActiveSection('gallery');
+        } else if (storiesRect.top <= 100) {
+          setActiveSection('stories');
+        } else if (charactersRect.top <= 100) {
+          setActiveSection('characters');
+        } else {
+          setActiveSection('home');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth scroll fonksiyonları
+  const scrollToCharacters = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.getElementById('characters-section');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  const scrollToStories = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.getElementById('stories-section');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  const scrollToGallery = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.getElementById('gallery-section');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  const scrollToMap = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.getElementById('map-section');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  const scrollToShop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.getElementById('shop-section');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
 
   useEffect(() => {
     const updateCartCount = () => {
@@ -53,11 +146,11 @@ export default function Navbar() {
   // Menü linkleri
   const menuLinks = [
     { href: "/", label: "Anasayfa" },
-    { href: "/characters", label: "Karakterler" },
-    { href: "/stories", label: "Hikayeler" },
-    { href: "/gallery", label: "Galeri" },
-    { href: "/map", label: "Harita" },
-    { href: "/shop", label: "Ürünlerimiz" },
+    { href: "/#characters", label: "Karakterler" },
+    { href: "/#stories", label: "Hikayeler" },
+    { href: "/#gallery", label: "Galeri" },
+    { href: "/#map", label: "Harita" },
+    { href: "/#shop", label: "Ürünlerimiz" },
   ];
 
   return (
@@ -71,18 +164,98 @@ export default function Navbar() {
       {/* Menü Linkleri (PC) */}
       <div className="hidden md:flex gap-4 lg:gap-6">
         {menuLinks.map(link => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={
-              (pathname === link.href
-                ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
-                : "hover:text-yellow-500 transition") +
-              " px-3 py-1 rounded-md whitespace-nowrap"
-            }
-          >
-            {link.label}
-          </Link>
+          link.href === "/" ? (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={
+                (activeSection === 'home'
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </Link>
+          ) : link.href === "/#characters" ? (
+            <button
+              key={link.href}
+              onClick={scrollToCharacters}
+              className={
+                (activeSection === 'characters'
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </button>
+          ) : link.href === "/#stories" ? (
+            <button
+              key={link.href}
+              onClick={scrollToStories}
+              className={
+                (activeSection === 'stories'
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </button>
+          ) : link.href === "/#gallery" ? (
+            <button
+              key={link.href}
+              onClick={scrollToGallery}
+              className={
+                (activeSection === 'gallery'
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </button>
+          ) : link.href === "/#map" ? (
+            <button
+              key={link.href}
+              onClick={scrollToMap}
+              className={
+                (activeSection === 'map'
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </button>
+          ) : link.href === "/#shop" ? (
+            <button
+              key={link.href}
+              onClick={scrollToShop}
+              className={
+                (activeSection === 'shop'
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </button>
+          ) : (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={
+                (pathname === link.href
+                  ? "bg-yellow-400 text-black font-bold border-b-4 border-yellow-600 shadow-md"
+                  : "hover:text-yellow-500 transition") +
+                " px-3 py-1 rounded-md whitespace-nowrap"
+              }
+            >
+              {link.label}
+            </Link>
+          )
         ))}
       </div>
       {/* Auth/Cart (PC) */}
@@ -186,19 +359,115 @@ export default function Navbar() {
           <div className="absolute top-16 left-0 right-0 bg-black border-b border-yellow-700 p-4 max-h-[70vh] overflow-y-auto rounded-b-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-4 text-yellow-300">
               {menuLinks.map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={
-                    (pathname === link.href
-                      ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
-                      : "hover:text-yellow-500 transition") +
-                    " py-3 text-lg rounded px-2"
-                  }
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
+                link.href === "/" ? (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={
+                      (activeSection === 'home'
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2"
+                    }
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ) : link.href === "/#characters" ? (
+                  <button
+                    key={link.href}
+                    onClick={(e) => {
+                      scrollToCharacters(e);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={
+                      (activeSection === 'characters'
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2 text-left"
+                    }
+                  >
+                    {link.label}
+                  </button>
+                ) : link.href === "/#stories" ? (
+                  <button
+                    key={link.href}
+                    onClick={(e) => {
+                      scrollToStories(e);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={
+                      (activeSection === 'stories'
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2 text-left"
+                    }
+                  >
+                    {link.label}
+                  </button>
+                ) : link.href === "/#gallery" ? (
+                  <button
+                    key={link.href}
+                    onClick={(e) => {
+                      scrollToGallery(e);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={
+                      (activeSection === 'gallery'
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2 text-left"
+                    }
+                  >
+                    {link.label}
+                  </button>
+                ) : link.href === "/#map" ? (
+                  <button
+                    key={link.href}
+                    onClick={(e) => {
+                      scrollToMap(e);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={
+                      (activeSection === 'map'
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2 text-left"
+                    }
+                  >
+                    {link.label}
+                  </button>
+                ) : link.href === "/#shop" ? (
+                  <button
+                    key={link.href}
+                    onClick={(e) => {
+                      scrollToShop(e);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={
+                      (activeSection === 'shop'
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2 text-left"
+                    }
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={
+                      (pathname === link.href
+                        ? "bg-yellow-400 text-black font-bold border-l-4 border-yellow-600 shadow-md"
+                        : "hover:text-yellow-500 transition") +
+                      " py-3 text-lg rounded px-2"
+                    }
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                )
               ))}
               {/* Kullanıcı işlemleri ve giriş/çıkış butonları mobilde büyük ve dokunmatik dostu olacak */}
               {!loading && (
