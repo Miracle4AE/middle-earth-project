@@ -22,7 +22,7 @@ const Footer: React.FC<FooterProps> = ({
           {/* İletişim Bilgileri */}
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold text-yellow-500 mb-4" style={{ fontFamily: 'Ringbearer' }}>
-              Gandalf'ın Mesajı
+              Gandalf&apos;ın Mesajı
             </h3>
             <div className="space-y-3 text-gray-300">
               <p className="flex items-center justify-center md:justify-start gap-2">
@@ -80,7 +80,7 @@ const Footer: React.FC<FooterProps> = ({
           {/* Sosyal Medya */}
           <div className="text-center md:text-right">
             <h3 className="text-2xl font-bold text-yellow-500 mb-4" style={{ fontFamily: 'Ringbearer' }}>
-              Palantír Bağlantıları
+              Palant&iacute;r Bağlantıları
             </h3>
             <div className="flex justify-center md:justify-end gap-4">
               <a href="#" className="text-2xl hover:text-yellow-400 transition-colors">
@@ -97,10 +97,10 @@ const Footer: React.FC<FooterProps> = ({
               </a>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              "Bir Yüzük hepsini yönetir,<br/>
+              &quot;Bir Yüzük hepsini yönetir,<br/>
               Bir Yüzük hepsini bulur,<br/>
               Bir Yüzük hepsini bir araya getirir<br/>
-              Ve karanlıkta onları birbirine bağlar"
+              Ve karanlıkta onları birbirine bağlar&quot;
             </p>
           </div>
         </div>
@@ -109,10 +109,10 @@ const Footer: React.FC<FooterProps> = ({
         <div className="border-t border-yellow-600/30 pt-8 text-center">
           <p className="text-gray-400 text-sm">
             © 2025 Middle-earth Projesi. Bu web sitesi ve içeriği <span className="text-yellow-500">Atakan Şahin</span> tarafından oluşturulmuştur. 
-            Tüm hakları saklıdır. Shire'dan Rivendell'e kadar hizmetinizdeyiz.
+            Tüm hakları saklıdır. Shire&apos;dan Rivendell&apos;e kadar hizmetinizdeyiz.
           </p>
           <p className="text-xs text-gray-600 mt-2">
-            "Yolculuk başlamakla başlar" - Bilbo Baggins
+            &quot;Yolculuk başlamakla başlar&quot; - Bilbo Baggins
           </p>
         </div>
       </div>
