@@ -729,6 +729,22 @@ export default function Home() {
                 </div>
               </div>
             </div>
+            {/* Tümünü Gör butonu */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-12 flex justify-center"
+            >
+              <MotionLink
+                href="/characters"
+                whileHover={{ scale: 1.1, boxShadow: "0 0 20px #FFD700" }}
+                className="px-8 py-4 rounded-full bg-yellow-500 text-black font-bold text-lg shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:text-gray-900"
+              >
+                {language === 'tr' ? 'Tümünü Gör' : 'View All'}
+              </MotionLink>
+            </motion.div>
           </motion.div>
         </div>
 
