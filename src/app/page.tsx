@@ -440,7 +440,7 @@ export default function Home() {
           setUsdRate(null);
           setUsdError('Kur alınamadı, fiyatlar ₺ olarak gösteriliyor.');
         }
-      } catch (_e) {
+      } catch {
         setUsdRate(null);
         setUsdError('Kur alınamadı, fiyatlar ₺ olarak gösteriliyor.');
       } finally {
