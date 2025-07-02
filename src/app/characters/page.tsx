@@ -379,12 +379,6 @@ export default function CharactersPage() {
   const goodChars = characters.filter((c) => c.type === "good");
   const evilChars = characters.filter((c) => c.type === "evil");
 
-  const maxLen = Math.max(goodChars.length, evilChars.length);
-  const pairedRows = Array.from({ length: maxLen }).map((_, i) => ({
-    good: goodChars[i],
-    evil: evilChars[i],
-  }));
-
   return (
     <div className="relative min-h-screen w-full">
       {/* Sabit arka plan yüzük görseli */}
