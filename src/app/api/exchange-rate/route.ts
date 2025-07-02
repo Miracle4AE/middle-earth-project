@@ -13,8 +13,8 @@ export async function GET() {
   } catch (e: unknown) {
     // Fallback: Sabit kur döndür
     let errorMsg = 'Unknown error';
-    if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
-      errorMsg = (e as any).message;
+    if (e && typeof e === 'object' && 'message' in e && typeof (e as { message?: unknown }).message === 'string') {
+      errorMsg = (e as { message: string }).message;
     }
     return NextResponse.json({ usd: 0.03, source: 'fallback', error: errorMsg }, { status: 200 });
   }
