@@ -6,12 +6,15 @@ import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { useLanguage } from "./LanguageContext";
 
 export default function Navbar() {
   const { user, loading } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const router = useRouter();
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const profileBtnRef = useRef<HTMLButtonElement>(null);
   let menuTimeout: NodeJS.Timeout | null = null;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -145,12 +148,12 @@ export default function Navbar() {
 
   // Menü linkleri
   const menuLinks = [
-    { href: "/", label: "Anasayfa" },
-    { href: "/#characters", label: "Karakterler" },
-    { href: "/#stories", label: "Hikayeler" },
-    { href: "/#gallery", label: "Galeri" },
-    { href: "/#map", label: "Harita" },
-    { href: "/#shop", label: "Ürünlerimiz" },
+    { href: "/", label: t('home') },
+    { href: "/#characters", label: t('characters') },
+    { href: "/#stories", label: t('stories') },
+    { href: "/#gallery", label: t('gallery') },
+    { href: "/#map", label: t('map') },
+    { href: "/#shop", label: t('shop') },
   ];
 
   return (
@@ -260,11 +263,53 @@ export default function Navbar() {
       </div>
       {/* Auth/Cart (PC) */}
       <div className="hidden md:flex gap-2 lg:gap-4 items-center">
+        {/* Dil Seçenekleri */}
+        <div className="relative">
+          <button
+            onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+            className="bg-yellow-400 text-black font-bold py-1 px-3 rounded hover:bg-yellow-500 transition text-sm flex items-center gap-1"
+          >
+            <span>{language === 'tr' ? '🇹🇷' : '🇺🇸'}</span>
+            <span className="hidden lg:inline">{language === 'tr' ? 'TR' : 'EN'}</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {languageMenuOpen && (
+            <div className="absolute right-0 mt-2 w-32 bg-black border-2 border-yellow-700 rounded-xl shadow-2xl z-50 flex flex-col text-sm">
+              <button
+                onClick={() => {
+                  setLanguage('tr');
+                  setLanguageMenuOpen(false);
+                }}
+                className={`px-3 py-2 text-left hover:bg-yellow-100/10 border-b border-yellow-700 flex items-center gap-2 ${
+                  language === 'tr' ? 'bg-yellow-400 text-black font-bold' : 'text-yellow-300'
+                }`}
+              >
+                <span>🇹🇷</span>
+                <span>{t('turkish')}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setLanguage('en');
+                  setLanguageMenuOpen(false);
+                }}
+                className={`px-3 py-2 text-left hover:bg-yellow-100/10 rounded-b-xl flex items-center gap-2 ${
+                  language === 'en' ? 'bg-yellow-400 text-black font-bold' : 'text-yellow-300'
+                }`}
+              >
+                <span>🇺🇸</span>
+                <span>{t('english')}</span>
+              </button>
+            </div>
+          )}
+        </div>
+
         {!loading && (
           <>
             {user ? (
               <>
-                <span className="text-yellow-200 text-base md:text-lg">Merhaba, {user.displayName || user.email}!</span>
+                <span className="text-yellow-200 text-base md:text-lg">{t('hello')}, {user.displayName || user.email}!</span>
                 <div className="relative"
                   onMouseEnter={handleMenuEnter}
                   onMouseLeave={handleMenuLeave}
@@ -274,26 +319,26 @@ export default function Navbar() {
                     onClick={() => setMenuOpen((v) => !v)}
                     className="bg-yellow-400 text-black font-bold py-1 px-4 rounded ml-4 hover:bg-yellow-500 transition text-base md:text-lg"
                   >
-                    Profilim
+                    {t('profile')}
                   </button>
                   {menuOpen && (
                     <div
                       className="absolute right-0 mt-2 w-56 bg-black border-2 border-yellow-700 rounded-xl shadow-2xl z-50 flex flex-col text-base animate-fade-in"
                     >
-                      <Link href="/orders" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Siparişlerim</Link>
-                      <Link href="/requests" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Soru ve Taleplerim</Link>
-                      <Link href="/offers" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Sana Özel Fırsatlar</Link>
-                      <Link href="/profile" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Kullanıcı Bilgilerim</Link>
-                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Değerlendirmelerim</Link>
-                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Beğendiklerim</Link>
-                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">Tüm Listelerim</Link>
-                      <button onClick={handleLogout} className="px-4 py-2 text-left hover:bg-red-600 hover:text-white rounded-b-xl">Çıkış Yap</button>
+                      <Link href="/orders" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('orders')}</Link>
+                      <Link href="/requests" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('requests')}</Link>
+                      <Link href="/offers" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('offers')}</Link>
+                      <Link href="/profile" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('profile_info')}</Link>
+                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('reviews')}</Link>
+                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('favorites')}</Link>
+                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('lists')}</Link>
+                      <button onClick={handleLogout} className="px-4 py-2 text-left hover:bg-red-600 hover:text-white rounded-b-xl">{t('logout')}</button>
                     </div>
                   )}
                 </div>
                 <Link href="/cart">
                   <button className="bg-yellow-400 text-black font-bold py-1 px-4 rounded ml-4 hover:bg-yellow-500 transition text-base md:text-lg relative flex items-center">
-                    Sepetim
+                    {t('cart')}
                     {cartCount > 0 && (
                       <motion.span
                         initial={{ scale: 0 }}
@@ -310,8 +355,8 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login" className="bg-yellow-400 text-black font-bold py-1 px-4 rounded hover:bg-yellow-500 transition text-base md:text-lg">Giriş Yap</Link>
-                <Link href="/register" className="bg-yellow-400 text-black font-bold py-1 px-4 rounded hover:bg-yellow-500 transition text-base md:text-lg">Kayıt Ol</Link>
+                <Link href="/login" className="bg-yellow-400 text-black font-bold py-1 px-4 rounded hover:bg-yellow-500 transition text-base md:text-lg">{t('login')}</Link>
+                <Link href="/register" className="bg-yellow-400 text-black font-bold py-1 px-4 rounded hover:bg-yellow-500 transition text-base md:text-lg">{t('register')}</Link>
               </>
             )}
           </>
@@ -319,11 +364,52 @@ export default function Navbar() {
       </div>
       {/* Hamburger Menü (Mobil) */}
       <div className="md:hidden flex items-center gap-2">
+        {/* Dil Seçenekleri Mobil */}
+        <div className="relative">
+          <button
+            onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+            className="bg-yellow-400 text-black font-bold py-1 px-2 rounded hover:bg-yellow-500 transition text-sm flex items-center gap-1"
+          >
+            <span>{language === 'tr' ? '🇹🇷' : '🇺🇸'}</span>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {languageMenuOpen && (
+            <div className="absolute right-0 mt-2 w-28 bg-black border-2 border-yellow-700 rounded-xl shadow-2xl z-50 flex flex-col text-sm">
+              <button
+                onClick={() => {
+                  setLanguage('tr');
+                  setLanguageMenuOpen(false);
+                }}
+                className={`px-2 py-1 text-left hover:bg-yellow-100/10 border-b border-yellow-700 flex items-center gap-1 ${
+                  language === 'tr' ? 'bg-yellow-400 text-black font-bold' : 'text-yellow-300'
+                }`}
+              >
+                <span>🇹🇷</span>
+                <span className="text-xs">{t('turkish')}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setLanguage('en');
+                  setLanguageMenuOpen(false);
+                }}
+                className={`px-2 py-1 text-left hover:bg-yellow-100/10 rounded-b-xl flex items-center gap-1 ${
+                  language === 'en' ? 'bg-yellow-400 text-black font-bold' : 'text-yellow-300'
+                }`}
+              >
+                <span>🇺🇸</span>
+                <span className="text-xs">{t('english')}</span>
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Sepet butonu mobilde */}
         {!loading && user && (
           <Link href="/cart">
             <button className="bg-yellow-400 text-black font-bold py-1 px-2 rounded hover:bg-yellow-500 transition text-sm relative flex items-center">
-              Sepet
+              {t('cart')}
               {cartCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
@@ -342,7 +428,7 @@ export default function Navbar() {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="text-yellow-400 hover:text-yellow-500 transition p-2"
-          aria-label="Menüyü Aç/Kapat"
+          aria-label={t('menu')}
         >
           <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileMenuOpen ? (
@@ -474,20 +560,20 @@ export default function Navbar() {
                 <>
                   {user ? (
                     <>
-                      <span className="text-yellow-200 text-base md:text-lg">Merhaba, {user.displayName || user.email}!</span>
-                      <Link href="/orders" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Siparişlerim</Link>
-                      <Link href="/requests" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Soru ve Taleplerim</Link>
-                      <Link href="/offers" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Sana Özel Fırsatlar</Link>
-                      <Link href="/profile" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Kullanıcı Bilgilerim</Link>
-                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Değerlendirmelerim</Link>
-                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Beğendiklerim</Link>
-                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>Tüm Listelerim</Link>
-                      <button onClick={handleLogout} className="w-full text-left hover:bg-red-600 hover:text-white py-2 px-2 rounded mt-2">Çıkış Yap</button>
+                      <span className="text-yellow-200 text-base md:text-lg">{t('hello')}, {user.displayName || user.email}!</span>
+                      <Link href="/orders" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('orders')}</Link>
+                      <Link href="/requests" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('requests')}</Link>
+                      <Link href="/offers" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('offers')}</Link>
+                      <Link href="/profile" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('profile_info')}</Link>
+                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('reviews')}</Link>
+                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('favorites')}</Link>
+                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('lists')}</Link>
+                      <button onClick={handleLogout} className="w-full text-left hover:bg-red-600 hover:text-white py-2 px-2 rounded mt-2">{t('logout')}</button>
                     </>
                   ) : (
                     <div className="border-t border-yellow-700 pt-4 mt-4 flex gap-2">
-                      <Link href="/login" className="bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition text-sm flex-1 text-center" onClick={() => setMobileMenuOpen(false)}>Giriş</Link>
-                      <Link href="/register" className="bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition text-sm flex-1 text-center" onClick={() => setMobileMenuOpen(false)}>Kayıt</Link>
+                      <Link href="/login" className="bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition text-sm flex-1 text-center" onClick={() => setMobileMenuOpen(false)}>{t('login')}</Link>
+                      <Link href="/register" className="bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition text-sm flex-1 text-center" onClick={() => setMobileMenuOpen(false)}>{t('register')}</Link>
                     </div>
                   )}
                 </>
