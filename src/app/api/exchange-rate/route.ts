@@ -10,8 +10,12 @@ export async function GET() {
       // Fallback: Sabit kur döndür
       return NextResponse.json({ usd: 0.03, source: 'fallback', error: data.error || 'API error' }, { status: 200 });
     }
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Fallback: Sabit kur döndür
-    return NextResponse.json({ usd: 0.03, source: 'fallback', error: e.message || 'Unknown error' }, { status: 200 });
+    let errorMsg = 'Unknown error';
+    if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
+      errorMsg = (e as any).message;
+    }
+    return NextResponse.json({ usd: 0.03, source: 'fallback', error: errorMsg }, { status: 200 });
   }
 } 

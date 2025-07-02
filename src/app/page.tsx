@@ -427,7 +427,6 @@ export default function Home() {
   }, [isLoaded, pageLoadTime]);
 
   useEffect(() => {
-    let ignore = false;
     async function fetchRate() {
       setUsdLoading(true);
       setUsdError(null);
@@ -449,7 +448,6 @@ export default function Home() {
       }
     }
     if (language === 'en') fetchRate();
-    return () => { ignore = true; };
   }, [language]);
 
   const handleToggleMute = () => {

@@ -173,7 +173,6 @@ export default function ShopPage() {
 
   // Kur cache'i (1 saatlik)
   useEffect(() => {
-    let ignore = false;
     console.log('Kur çekme useEffect tetiklendi, dil:', language);
     async function fetchRate() {
       setUsdLoading(true);
@@ -200,7 +199,6 @@ export default function ShopPage() {
     if (language === 'en') {
       fetchRate();
     }
-    return () => { ignore = true; };
   }, [language]);
 
   useEffect(() => {
