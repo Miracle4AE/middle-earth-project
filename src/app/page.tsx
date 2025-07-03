@@ -352,14 +352,17 @@ export default function Home() {
   }, [isLoaded]);
 
   useEffect(() => {
-    const videoUrl = "/video/lotr-intro.mp4";
+    // Dil değişikliğine göre video URL'ini belirle
+    const videoUrl = language === 'en' ? "/video/lotr-intro-en.mp4" : "/video/lotr-intro.mp4";
 
     async function fetchVideo() {
       const response = await fetch(videoUrl);
       if (!response.ok) {
         console.error("Video yüklenemedi!");
+        // Eğer İngilizce video yoksa Türkçe videoyu kullan
+        const fallbackUrl = "/video/lotr-intro.mp4";
         setIsLoaded(true);
-        setVideoSrc(videoUrl);
+        setVideoSrc(fallbackUrl);
         return;
       }
 
@@ -395,7 +398,7 @@ export default function Home() {
     }
 
     fetchVideo();
-  }, []);
+  }, [language]); // language dependency'sini ekledik
 
   // Overlay'i 25 saniye sonra gizle ve scroll kontrolü
   useEffect(() => {
@@ -506,6 +509,24 @@ export default function Home() {
           >
             Tarayıcınız video etiketini desteklemiyor.
           </video>
+
+          {/* Navbar'dan hemen sonra bilgilendirme yazısı */}
+          <motion.div
+            initial={{ opacity: 1 }}
+            animate={{ opacity: showOverlay ? 1 : 0 }}
+            transition={{ duration: 1 }}
+            className="w-full flex justify-center z-30"
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, marginTop: '64px', pointerEvents: 'none' }}
+          >
+            <div
+              className="font-[Ringbearer] text-yellow-400 text-xl sm:text-3xl md:text-5xl font-extrabold animate-pulse drop-shadow-[0_0_20px_gold] text-center px-4 py-2"
+              style={{ letterSpacing: '1px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '2px solid #FFD700', maxWidth: '90%' }}
+            >
+              {language === 'en'
+                ? 'Video is playing. Click the button at the bottom right to unmute!'
+                : 'Video oynatılıyor. Sesi açmak için sağ alttaki butona tıklayabilirsin!'}
+            </div>
+          </motion.div>
 
           {/* Overlay: 25 saniye sonra fade out - Sadece video bölümünde */}
           <motion.main
