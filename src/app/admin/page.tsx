@@ -75,7 +75,6 @@ export default function AdminPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [error, setError] = useState("");
 
   // Dashboard verileri
   const [stats, setStats] = useState({
@@ -137,15 +136,16 @@ export default function AdminPage() {
     e.preventDefault();
     if (username === "nobody4" && password === "Ae080919") {
       setIsLoggedIn(true);
-      setError("");
-    } else {
-      setError("Kullanıcı adı veya şifre yanlış!");
     }
   };
 
   // Dashboard verilerini yükle
   const loadDashboardStats = async () => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       const usersSnapshot = await getDocs(collection(db, "profiles"));
       const ordersSnapshot = await getDocs(collection(db, "orders"));
       const productsSnapshot = await getDocs(collection(db, "products"));
@@ -170,6 +170,10 @@ export default function AdminPage() {
   // Kullanıcıları yükle
   const loadUsers = async () => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       const snapshot = await getDocs(collection(db, "profiles"));
       const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as User[];
       setUsers(usersData);
@@ -181,6 +185,10 @@ export default function AdminPage() {
   // Ürünleri yükle
   const loadProducts = async () => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       const snapshot = await getDocs(collection(db, "products"));
       const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
       setProducts(productsData);
@@ -192,6 +200,10 @@ export default function AdminPage() {
   // Siparişleri yükle
   const loadOrders = async () => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
       const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
@@ -204,6 +216,10 @@ export default function AdminPage() {
   // Fırsatları yükle
   const loadOffers = async () => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       const snapshot = await getDocs(collection(db, "offers"));
       const offersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
       setOffers(offersData);
@@ -215,6 +231,10 @@ export default function AdminPage() {
   // Soru/Talepleri yükle
   const loadRequests = async () => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       const q = query(collection(db, "requests"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
       const requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Request[];
@@ -239,11 +259,11 @@ export default function AdminPage() {
   // Ürün ekleme
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productForm.name || !productForm.price || !productForm.category) {
-      setError("Lütfen tüm zorunlu alanları doldurun.");
-      return;
-    }
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       await addDoc(collection(db, "products"), {
         ...productForm,
         price: parseFloat(productForm.price),
@@ -252,24 +272,19 @@ export default function AdminPage() {
       });
       setProductForm({ name: "", price: "", category: "", description: "", image: "", stock: "" });
       loadProducts();
-      setError("");
     } catch {
-      setError("Ürün eklenirken hata oluştu.");
+      console.error("Ürün eklenirken hata oluştu.");
     }
   };
 
   // Fırsat ekleme
   const handleAddOffer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!offerForm.title || !offerForm.description) {
-      setError("Lütfen tüm zorunlu alanları doldurun.");
-      return;
-    }
-    if (offerForm.targetType === "ozel" && !offerForm.targetUser) {
-      setError("Kişiye özel fırsat için kullanıcı e-posta veya ID girin.");
-      return;
-    }
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       await addDoc(collection(db, "offers"), {
         ...offerForm,
         discount: offerForm.discount || "",
@@ -281,19 +296,22 @@ export default function AdminPage() {
         title: "", description: "", type: "discount", discount: "", code: "", expiry: "", minAmount: "", targetType: "genel", targetUser: ""
       });
       loadOffers();
-      setError("");
     } catch {
-      setError("Fırsat eklenirken hata oluştu.");
+      console.error("Fırsat eklenirken hata oluştu.");
     }
   };
 
   // Sipariş durumu güncelleme
   const updateOrderStatus = async (orderId: string, status: string) => {
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        return;
+      }
       await updateDoc(doc(db, "orders", orderId), { status });
       loadOrders();
     } catch {
-      setError("Sipariş durumu güncellenirken hata oluştu.");
+      console.error("Sipariş durumu güncellenirken hata oluştu.");
     }
   };
 
@@ -301,10 +319,14 @@ export default function AdminPage() {
   const deleteOffer = async (offerId: string) => {
     if (confirm("Bu fırsatı silmek istediğinizden emin misiniz?")) {
       try {
+        if (!db) {
+          console.error("Firebase veritabanı başlatılamadı.");
+          return;
+        }
         await deleteDoc(doc(db, "offers", offerId));
         loadOffers();
       } catch {
-        setError("Fırsat silinirken hata oluştu.");
+        console.error("Fırsat silinirken hata oluştu.");
       }
     }
   };
@@ -313,21 +335,25 @@ export default function AdminPage() {
   const handleBulkAddOffers = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bulkOfferForm.title || !bulkOfferForm.description || !bulkOfferForm.emailList) {
-      setError("Lütfen tüm zorunlu alanları doldurun.");
+      console.error("Lütfen tüm zorunlu alanları doldurun.");
       return;
     }
     
     const emails = bulkOfferForm.emailList.split('\n').map(email => email.trim()).filter(email => email);
     if (emails.length === 0) {
-      setError("Geçerli e-posta adresi bulunamadı.");
+      console.error("Geçerli e-posta adresi bulunamadı.");
       return;
     }
     
     setBulkLoading(true);
     setBulkProgress({ current: 0, total: emails.length });
-    setError("");
     
     try {
+      if (!db) {
+        console.error("Firebase veritabanı başlatılamadı.");
+        setBulkLoading(false);
+        return;
+      }
       for (let i = 0; i < emails.length; i++) {
         const email = emails[i];
         await addDoc(collection(db, "offers"), {
@@ -351,9 +377,8 @@ export default function AdminPage() {
       });
       setBulkProgress({ current: 0, total: 0 });
       loadOffers();
-      setError("");
     } catch {
-      setError("Toplu fırsat eklenirken hata oluştu.");
+      console.error("Toplu fırsat eklenirken hata oluştu.");
     } finally {
       setBulkLoading(false);
     }
@@ -362,9 +387,13 @@ export default function AdminPage() {
   // Kullanıcıya şifre sıfırlama maili gönder
   const handleResetPassword = async (email: string) => {
     try {
+      if (!auth) {
+        console.error("Firebase auth başlatılamadı.");
+        return;
+      }
       await sendPasswordResetEmail(auth, email);
-      alert(`Şifre sıfırlama maili ${email} adresine gönderildi!`);
-    } catch {
+      alert("Şifre sıfırlama e-postası gönderildi.");
+    } catch (error) {
       alert("Şifre sıfırlama maili gönderilemedi. Lütfen e-posta adresini kontrol et.");
     }
   };
@@ -392,7 +421,6 @@ export default function AdminPage() {
           <button type="submit" className="bg-yellow-400 text-black font-bold py-3 rounded hover:bg-yellow-500 transition">
             Giriş Yap
           </button>
-          {error && <div className="text-red-500 text-center">{error}</div>}
         </form>
       </div>
     );
@@ -438,8 +466,6 @@ export default function AdminPage() {
 
       {/* Content */}
       <div className="flex-1 p-8">
-        {error && <div className="bg-red-900/30 border border-red-500 text-red-400 p-3 rounded mb-4">{error}</div>}
-
         {/* Dashboard */}
         {activeTab === "dashboard" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

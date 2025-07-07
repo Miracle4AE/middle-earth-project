@@ -15,11 +15,11 @@ interface FirebaseConfig {
 }
 
 // Firebase config'i sadece client-side'da oluştur
-let firebaseConfig: FirebaseConfig | null = null;
-let app: FirebaseApp | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
-let analytics: Analytics | null = null;
+let firebaseConfig: FirebaseConfig | undefined = undefined;
+let app: FirebaseApp | undefined = undefined;
+let auth: Auth | undefined = undefined;
+let db: Firestore | undefined = undefined;
+let analytics: Analytics | undefined = undefined;
 
 // Sadece client-side'da Firebase'i initialize et
 if (typeof window !== "undefined") {
@@ -50,11 +50,6 @@ if (typeof window !== "undefined") {
   } catch (error) {
     console.error("Firebase initialization error:", error);
   }
-} else {
-  // SSR sırasında null değerler döndür
-  auth = null;
-  db = null;
-  analytics = null;
 }
 
 export { auth, db, analytics }; 

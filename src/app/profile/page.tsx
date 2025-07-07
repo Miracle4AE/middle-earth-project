@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { Firestore } from "firebase/firestore";
 
 interface Address {
   title: string;
@@ -77,30 +78,32 @@ export default function ProfilePage() {
     }
     if (user) {
       const fetchProfile = async () => {
-        const ref = doc(db, "profiles", user.uid);
+        if (!db || !user) {
+          return;
+        }
+        const ref = doc(db as Firestore, "profiles", user.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
-          const data = snap.data();
           setForm({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            birthDate: data.birthDate || "",
-            gender: data.gender || "",
-            phone: data.phone || "",
-            email: data.email || user.email || ""
+            firstName: snap.data().firstName || "",
+            lastName: snap.data().lastName || "",
+            birthDate: snap.data().birthDate || "",
+            gender: snap.data().gender || "",
+            phone: snap.data().phone || "",
+            email: snap.data().email || user.email || ""
           });
           setUpdateForm({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            birthDate: data.birthDate || "",
-            gender: data.gender || "",
-            phone: data.phone || "",
-            email: data.email || user.email || ""
+            firstName: snap.data().firstName || "",
+            lastName: snap.data().lastName || "",
+            birthDate: snap.data().birthDate || "",
+            gender: snap.data().gender || "",
+            phone: snap.data().phone || "",
+            email: snap.data().email || user.email || ""
           });
           setPrefs({
-            sms: data.sms ?? false,
-            email: data.emailPref ?? false,
-            phone: data.phonePref ?? false
+            sms: snap.data().sms ?? false,
+            email: snap.data().emailPref ?? false,
+            phone: snap.data().phonePref ?? false
           });
         } else {
           setForm(f => ({ ...f, email: user.email || "" }));
@@ -108,7 +111,10 @@ export default function ProfilePage() {
         }
       };
       const fetchAddresses = async () => {
-        const ref = doc(db, "addresses", user.uid);
+        if (!db || !user) {
+          return;
+        }
+        const ref = doc(db as Firestore, "addresses", user.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           setAddresses(snap.data().list || []);
@@ -177,7 +183,7 @@ export default function ProfilePage() {
       return;
     }
     try {
-      await setDoc(doc(db, "profiles", user.uid), {
+      await setDoc(doc(db as Firestore, "profiles", user.uid), {
         sms: prefs.sms,
         emailPref: prefs.email,
         phonePref: prefs.phone
@@ -210,7 +216,7 @@ export default function ProfilePage() {
     }
     try {
       const newAddresses = [...addresses, { ...addressForm }];
-      await setDoc(doc(db, "addresses", user.uid), { list: newAddresses });
+      await setDoc(doc(db as Firestore, "addresses", user.uid), { list: newAddresses });
       setAddresses(newAddresses);
       setAddressForm({ title: "", country: "Türkiye", city: "", district: "", address: "" });
       setAddressMsg("Adres eklendi!");
@@ -223,7 +229,7 @@ export default function ProfilePage() {
   const handleDeleteAddress = async (idx: number) => {
     if (!user) return;
     const newAddresses = addresses.filter((_, i) => i !== idx);
-    await setDoc(doc(db, "addresses", user.uid), { list: newAddresses });
+    await setDoc(doc(db as Firestore, "addresses", user.uid), { list: newAddresses });
     setAddresses(newAddresses);
   };
 
@@ -268,7 +274,7 @@ export default function ProfilePage() {
         setUpdateLoading(false);
         return;
       }
-      await setDoc(doc(db, "profiles", user.uid), { ...updateForm }, { merge: true });
+      await setDoc(doc(db as Firestore, "profiles", user.uid), { ...updateForm }, { merge: true });
       setUpdateMsg("Bilgiler güncellendi!");
     } catch {
       setUpdateError("Bir hata oluştu. Lütfen tekrar dene.");

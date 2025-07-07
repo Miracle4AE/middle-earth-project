@@ -25,6 +25,11 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
+      if (!auth) {
+        setError("Firebase auth başlatılamadı. Lütfen daha sonra tekrar deneyin.");
+        setLoading(false);
+        return;
+      }
       const cred = await signInWithEmailAndPassword(auth, email, password);
       setUser(cred.user);
       router.push("/");
@@ -51,8 +56,13 @@ export default function LoginPage() {
     setError("");
     setMessage("");
     try {
+      if (!auth) {
+        setError("Firebase auth başlatılamadı. Lütfen daha sonra tekrar deneyin.");
+        return;
+      }
       await sendPasswordResetEmail(auth, email);
-      setMessage("Şifre sıfırlama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.");
+      setMessage("Şifre sıfırlama e-postası gönderildi.");
+      setShowReset(false);
     } catch (error: unknown) {
       console.error("Şifre sıfırlama sırasında hata:", error);
       const authError = error as AuthError;

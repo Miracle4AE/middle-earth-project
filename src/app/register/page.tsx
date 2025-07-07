@@ -78,6 +78,16 @@ export default function RegisterPage() {
     setError("");
 
     try {
+      if (!auth) {
+        setError("Firebase auth başlatılamadı. Lütfen daha sonra tekrar deneyin.");
+        setLoading(false);
+        return;
+      }
+      if (!db) {
+        setError("Firebase veritabanı başlatılamadı. Lütfen daha sonra tekrar deneyin.");
+        setLoading(false);
+        return;
+      }
       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       const user = userCredential.user;
 

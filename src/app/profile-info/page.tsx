@@ -27,7 +27,11 @@ export default function ProfileInfoPage() {
     }
     if (user) {
       const fetchProfile = async () => {
-        const ref = doc(db, "profiles", user.uid);
+        const ref = db && user ? doc(db, "profiles", user.uid) : undefined;
+        if (!ref) {
+          setError("Veritabanı referansı oluşturulamadı.");
+          return;
+        }
         const snap = await getDoc(ref);
         if (snap.exists()) {
           const data = snap.data();
@@ -53,6 +57,10 @@ export default function ProfileInfoPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!db) {
+      setError("Firebase veritabanı başlatılamadı. Lütfen daha sonra tekrar deneyin.");
+      return;
+    }
     setSaving(true);
     setSuccess("");
     setError("");
