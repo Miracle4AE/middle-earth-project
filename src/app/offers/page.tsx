@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
 import { useRouter } from "next/navigation";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "../lib/firebase";
 
 interface Offer {
   id: string;
