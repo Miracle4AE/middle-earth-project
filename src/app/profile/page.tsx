@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import { useRouter } from "next/navigation";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "../../lib/firebase";
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 
 interface Address {

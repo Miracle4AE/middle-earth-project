@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "../../lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "../../lib/firebase";
 import { Timestamp } from "firebase/firestore";
 
 // Interface tanımlamaları
