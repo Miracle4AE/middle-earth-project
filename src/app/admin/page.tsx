@@ -162,8 +162,8 @@ export default function AdminPage() {
         totalProducts: productsSnapshot.size,
         totalRevenue: totalRevenue
       });
-    } catch (error) {
-      console.error("Dashboard verileri yüklenirken hata:", error);
+    } catch {
+      console.error("Dashboard verileri yüklenirken hata:");
     }
   };
 
@@ -177,8 +177,8 @@ export default function AdminPage() {
       const snapshot = await getDocs(collection(db, "profiles"));
       const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as User[];
       setUsers(usersData);
-    } catch (error) {
-      console.error("Kullanıcılar yüklenirken hata:", error);
+    } catch {
+      console.error("Kullanıcılar yüklenirken hata:");
     }
   };
 
@@ -192,8 +192,8 @@ export default function AdminPage() {
       const snapshot = await getDocs(collection(db, "products"));
       const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
       setProducts(productsData);
-    } catch (error) {
-      console.error("Ürünler yüklenirken hata:", error);
+    } catch {
+      console.error("Ürünler yüklenirken hata:");
     }
   };
 
@@ -208,8 +208,8 @@ export default function AdminPage() {
       const snapshot = await getDocs(q);
       const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
       setOrders(ordersData);
-    } catch (error) {
-      console.error("Siparişler yüklenirken hata:", error);
+    } catch {
+      console.error("Siparişler yüklenirken hata:");
     }
   };
 
@@ -223,8 +223,8 @@ export default function AdminPage() {
       const snapshot = await getDocs(collection(db, "offers"));
       const offersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
       setOffers(offersData);
-    } catch (error) {
-      console.error("Fırsatlar yüklenirken hata:", error);
+    } catch {
+      console.error("Fırsatlar yüklenirken hata:");
     }
   };
 
@@ -239,8 +239,8 @@ export default function AdminPage() {
       const snapshot = await getDocs(q);
       const requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Request[];
       setRequests(requestsData);
-    } catch (error) {
-      console.error("Soru/Talepler yüklenirken hata:", error);
+    } catch {
+      console.error("Soru/Talepler yüklenirken hata:");
     }
   };
 
@@ -393,7 +393,7 @@ export default function AdminPage() {
       }
       await sendPasswordResetEmail(auth, email);
       alert("Şifre sıfırlama e-postası gönderildi.");
-    } catch (error) {
+    } catch {
       alert("Şifre sıfırlama maili gönderilemedi. Lütfen e-posta adresini kontrol et.");
     }
   };
