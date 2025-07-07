@@ -131,6 +131,10 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
+      if (!auth) {
+        console.error("Firebase auth başlatılamadı.");
+        return;
+      }
       await signOut(auth);
       router.push("/");
     } catch (error) {
