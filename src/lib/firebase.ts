@@ -1,24 +1,35 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
+import { getAnalytics, Analytics } from "firebase/analytics";
+import { getFirestore, Firestore } from "firebase/firestore";
+
+// Firebase config interface'i
+interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
+}
 
 // Firebase config'i sadece client-side'da oluştur
-let firebaseConfig: any = null;
-let app: any = null;
-let auth: any = null;
-let db: any = null;
-let analytics: any = null;
+let firebaseConfig: FirebaseConfig | null = null;
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+let analytics: Analytics | null = null;
 
 // Sadece client-side'da Firebase'i initialize et
 if (typeof window !== "undefined") {
   // Ortam değişkenlerinin eksik olup olmadığını kontrol et
-  function checkEnvVar(name: string) {
+  function checkEnvVar(name: string): string {
     if (!process.env[name]) {
       console.warn(`Environment variable ${name} is not defined!`);
       return "";
     }
-    return process.env[name];
+    return process.env[name] || "";
   }
 
   firebaseConfig = {
@@ -40,7 +51,7 @@ if (typeof window !== "undefined") {
     console.error("Firebase initialization error:", error);
   }
 } else {
-  // SSR sırasında dummy değerler döndür
+  // SSR sırasında null değerler döndür
   auth = null;
   db = null;
   analytics = null;
