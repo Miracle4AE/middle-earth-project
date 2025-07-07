@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, updateProfile, AuthError } from "firebase/auth";
-import { auth, db } from "../lib/firebase";
+import { auth, db } from '../../lib/firebase';
 import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 
