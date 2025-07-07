@@ -43,6 +43,11 @@ export default function RequestsPage() {
         setSending(false);
         return;
       }
+      if (!db) {
+        setError("Firestore bağlantısı kurulamadı.");
+        setSending(false);
+        return;
+      }
       await addDoc(collection(db, "requests"), {
         userId: user.uid,
         category: form.category,
