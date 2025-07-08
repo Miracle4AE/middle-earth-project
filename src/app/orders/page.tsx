@@ -40,7 +40,7 @@ export default function OrdersPage() {
             console.error("Firestore bağlantısı kurulamadı");
             return;
           }
-          const q = query(collection(db, "orders"), where("userId", "==", user.uid));
+          const q = query(collection(db!, "orders"), where("userId", "==", user.uid));
           const querySnapshot = await getDocs(q);
           const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
           

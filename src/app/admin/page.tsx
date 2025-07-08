@@ -146,9 +146,9 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      const usersSnapshot = await getDocs(collection(db, "profiles"));
-      const ordersSnapshot = await getDocs(collection(db, "orders"));
-      const productsSnapshot = await getDocs(collection(db, "products"));
+      const usersSnapshot = await getDocs(collection(db!, "profiles"));
+      const ordersSnapshot = await getDocs(collection(db!, "orders"));
+      const productsSnapshot = await getDocs(collection(db!, "products"));
 
       let totalRevenue = 0;
       ordersSnapshot.forEach(doc => {
@@ -174,7 +174,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      const snapshot = await getDocs(collection(db, "profiles"));
+      const snapshot = await getDocs(collection(db!, "profiles"));
       const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as User[];
       setUsers(usersData);
     } catch {
@@ -189,7 +189,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      const snapshot = await getDocs(collection(db, "products"));
+      const snapshot = await getDocs(collection(db!, "products"));
       const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
       setProducts(productsData);
     } catch {
@@ -204,7 +204,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+      const q = query(collection(db!, "orders"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
       const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
       setOrders(ordersData);
@@ -220,7 +220,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      const snapshot = await getDocs(collection(db, "offers"));
+      const snapshot = await getDocs(collection(db!, "offers"));
       const offersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Offer[];
       setOffers(offersData);
     } catch {
@@ -235,7 +235,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      const q = query(collection(db, "requests"), orderBy("createdAt", "desc"));
+      const q = query(collection(db!, "requests"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
       const requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Request[];
       setRequests(requestsData);
@@ -264,7 +264,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      await addDoc(collection(db, "products"), {
+      await addDoc(collection(db!, "products"), {
         ...productForm,
         price: parseFloat(productForm.price),
         stock: parseInt(productForm.stock) || 0,
@@ -285,7 +285,7 @@ export default function AdminPage() {
         console.error("Firebase veritabanı başlatılamadı.");
         return;
       }
-      await addDoc(collection(db, "offers"), {
+      await addDoc(collection(db!, "offers"), {
         ...offerForm,
         discount: offerForm.discount || "",
         minAmount: offerForm.minAmount ? parseFloat(offerForm.minAmount) : 0,

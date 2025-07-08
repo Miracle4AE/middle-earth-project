@@ -173,14 +173,12 @@ export default function ShopPage() {
 
   // Kur cache'i (1 saatlik)
   useEffect(() => {
-    console.log('Kur çekme useEffect tetiklendi, dil:', language);
     async function fetchRate() {
       setUsdLoading(true);
       setUsdError(null);
       try {
         const res = await fetch('/api/exchange-rate');
         const data = await res.json();
-        console.log('Kur API yanıtı:', data);
         if (data && typeof data.usd === 'number' && !isNaN(data.usd)) {
           setUsdRate(data.usd);
           setUsdError(null);
@@ -260,7 +258,7 @@ export default function ShopPage() {
     router.push("/checkout");
   };
 
-  console.log('LANG:', language, 'USD_RATE:', usdRate);
+
 
   return (
     <motion.div
