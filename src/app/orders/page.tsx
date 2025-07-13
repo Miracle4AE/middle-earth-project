@@ -27,7 +27,7 @@ export default function OrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!loading && !user) {

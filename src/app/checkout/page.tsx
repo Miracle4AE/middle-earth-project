@@ -29,8 +29,6 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const [usdRate, setUsdRate] = useState<number | null>(null);
-  const [usdLoading, setUsdLoading] = useState(false);
-  const [usdError, setUsdError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -49,23 +47,18 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (language === 'en') {
-      setUsdLoading(true);
       fetch('/api/exchange-rate')
         .then(res => res.json())
         .then(data => {
           if (data && typeof data.usd === 'number' && !isNaN(data.usd)) {
             setUsdRate(data.usd);
-            setUsdError(null);
           } else {
             setUsdRate(null);
-            setUsdError('Exchange rate unavailable, showing prices in ₺.');
           }
         })
         .catch(() => {
           setUsdRate(null);
-          setUsdError('Exchange rate unavailable, showing prices in ₺.');
-        })
-        .finally(() => setUsdLoading(false));
+        });
     }
   }, [language]);
 

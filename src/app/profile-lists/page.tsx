@@ -3,28 +3,7 @@ import React, { useState } from "react";
 import Toast from "../shop/Toast";
 import { useLanguage } from "../LanguageContext";
 
-const initialMockFavorites = [
-  { name: "Orta Dünya Koleksiyonum", count: 5 },
-  { name: "Elf Takıları", count: 2 },
-];
-const initialMockShopping = [
-  { name: "Doğum Günü Listem", count: 3 },
-];
-const mockCompare = [
-  { name: "Tek Yüzük", desc: "Yüzük", id: 1 },
-  { name: "Andúril", desc: "Kılıç", id: 2 },
-];
-const mockReviews = [
-  { name: "Tek Yüzük", comment: "Çok kaliteli!", rating: 5 },
-  { name: "Gandalf Figürü", comment: "Detaylar harika.", rating: 4 },
-];
-const mockShared = [
-  { name: "Paylaşılan Koleksiyonum", link: "https://lotr-shop.com/list/123" },
-];
-
 export default function ProfileListsPage() {
-  const [mockFavorites, setMockFavorites] = useState(initialMockFavorites);
-  const [mockShopping, setMockShopping] = useState(initialMockShopping);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'favori' | 'alisveris' | null>(null);
   const [newListName, setNewListName] = useState("");
@@ -38,34 +17,13 @@ export default function ProfileListsPage() {
   };
   const handleCreateList = () => {
     if (modalType === 'favori') {
-      setMockFavorites(prev => [...prev, { name: newListName, count: 0 }]);
+      // setMockFavorites(prev => [...prev, { name: newListName, count: 0 }]);
     } else if (modalType === 'alisveris') {
-      setMockShopping(prev => [...prev, { name: newListName, count: 0 }]);
+      // setMockShopping(prev => [...prev, { name: newListName, count: 0 }]);
     }
     setShowModal(false);
     setToast({ message: `Yeni ${modalType === 'favori' ? 'favori' : 'alışveriş'} listesi oluşturuldu!`, type: "success" });
     setNewListName("");
-  };
-
-  // Paylaş butonu işlevi
-  const handleShare = (listName: string) => {
-    const fakeLink = `https://lotr-shop.com/list/${encodeURIComponent(listName)}`;
-    navigator.clipboard.writeText(fakeLink);
-    setToast({ message: 'Paylaşılabilir link kopyalandı!', type: 'success' });
-  };
-
-  // Dışa Aktar butonu işlevi (mock CSV)
-  const handleExport = (listName: string) => {
-    const csvContent = `Liste Adı\n"${listName}"`;
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${listName}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setToast({ message: 'Liste başarıyla dışa aktarıldı!', type: 'success' });
   };
 
   return (

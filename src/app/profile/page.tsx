@@ -19,7 +19,7 @@ interface Address {
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("info");
 
   // Üyelik Bilgilerim

@@ -35,7 +35,7 @@ export default function RequestsPage() {
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
   const [userRequests, setUserRequests] = useState<Request[]>([]);
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!user || !db) return;
