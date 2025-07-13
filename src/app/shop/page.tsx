@@ -6,7 +6,7 @@ import { useAuth } from "../AuthContext";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../LanguageContext";
 import { db } from '../../lib/firebase';
-import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc, query, where, getDocs } from "firebase/firestore";
+import { doc, updateDoc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import StarIcon from "../StarIcon";
@@ -41,6 +41,18 @@ const categories = [
 
 type Product = { name: { tr: string; en: string }; price: string; img: string; desc: { tr: string; en: string }; category: string };
 type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
+
+// Review tipi
+type Review = {
+  productName: string;
+  productCategory: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  imageUrl?: string;
+  createdAt?: { toDate: () => Date };
+};
 
 export const initialProducts: Record<string, Product[]> = {
   rings: [
@@ -177,27 +189,27 @@ export default function ShopPage() {
   const [comment, setComment] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [reviews, setReviews] = useState<Record<string, any[]>>({});
+  const [reviews, setReviews] = useState<Record<string, Review[]>>({});
   
   // Yeni state'ler
   const [showReviewsModal, setShowReviewsModal] = useState(false);
-  const [selectedProductReviews, setSelectedProductReviews] = useState<any[]>([]);
+  const [selectedProductReviews, setSelectedProductReviews] = useState<Review[]>([]);
   const [selectedProductForReviews, setSelectedProductForReviews] = useState<Product | null>(null);
 
   // Ürünlere ait yorumları çek
   useEffect(() => {
     const fetchReviews = async () => {
       if (!db) return;
-      const allReviews: Record<string, any[]> = {};
+      const allReviews: Record<string, Review[]> = {};
       for (const cat of categories) {
         const q = query(collection(db, "reviews"), where("productCategory", "==", cat.key));
         const snap = await getDocs(q);
-        allReviews[cat.key] = snap.docs.map(doc => doc.data());
+        allReviews[cat.key] = snap.docs.map(doc => doc.data() as Review);
       }
       setReviews(allReviews);
     };
     fetchReviews();
-  }, [db]);
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -618,7 +630,7 @@ export default function ShopPage() {
               className="mb-3 text-yellow-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-yellow-700 file:via-yellow-500 file:to-yellow-300 file:text-black hover:file:bg-yellow-400"
             />
             {preview && (
-              <img src={preview} alt="Önizleme" className="mb-3 max-h-32 rounded-xl border-2 border-yellow-300 mx-auto" />
+              <Image src={preview} alt="Önizleme" width={128} height={128} className="mb-3 max-h-32 rounded-xl border-2 border-yellow-300 mx-auto object-contain" />
             )}
             <button
               className="w-full mt-2 py-3 bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300 text-black font-bold rounded-2xl shadow-lg hover:scale-105 hover:shadow-yellow-400/60 transition-all duration-200 tracking-wide border border-yellow-200/60 text-lg"
@@ -673,10 +685,12 @@ export default function ShopPage() {
                   </div>
                   <p className="text-yellow-100 text-base mb-1">{review.comment}</p>
                   {review.imageUrl && (
-                    <img 
-                      src={review.imageUrl} 
-                      alt="Yorum görseli" 
-                      className="max-h-32 rounded border border-yellow-200 mt-1" 
+                    <Image
+                      src={review.imageUrl}
+                      alt="Yorum görseli"
+                      width={128}
+                      height={128}
+                      className="max-h-32 rounded border border-yellow-200 mt-1 object-contain"
                     />
                   )}
                   {index < selectedProductReviews.length - 1 && (

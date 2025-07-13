@@ -43,8 +43,9 @@ export default function FavoritesPage() {
 
   const handleAddToCart = (product: Product) => {
     if (typeof window === 'undefined') return;
-    const cart = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
-    const existingIndex = cart.findIndex((item: any) => item.name === product.name[lang] && item.category === product.category);
+    type CartItem = { name: string; price: string; img: string; category: string; quantity: number };
+    const cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+    const existingIndex = cart.findIndex((item) => item.name === product.name[lang] && item.category === product.category);
     if (existingIndex !== -1) {
       cart[existingIndex].quantity += 1;
     } else {

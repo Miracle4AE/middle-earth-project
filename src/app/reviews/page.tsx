@@ -8,12 +8,23 @@ import { db } from '../../lib/firebase';
 import Image from "next/image";
 import { initialProducts } from "../shop/page";
 
+type Review = {
+  productName: string;
+  productCategory: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  imageUrl?: string;
+  createdAt?: { toDate: () => Date };
+};
+
 export default function ReviewsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [editModal, setEditModal] = useState(false);
-  const [editReview, setEditReview] = useState<any | null>(null);
+  const [editReview, setEditReview] = useState<Review | null>(null);
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState('');
   const [editImage, setEditImage] = useState<File | null>(null);
@@ -25,7 +36,7 @@ export default function ReviewsPage() {
       if (!db) return;
       const q = query(collection(db, "reviews"), where("userId", "==", user.uid));
       const snap = await getDocs(q);
-      setReviews(snap.docs.map(doc => doc.data()));
+      setReviews(snap.docs.map(doc => doc.data() as Review));
     };
     fetchReviews();
   }, [user]);
@@ -42,7 +53,7 @@ export default function ReviewsPage() {
     }
   };
 
-  const handleEdit = (review: any) => {
+  const handleEdit = (review: Review) => {
     setEditReview(review);
     setEditRating(review.rating);
     setEditComment(review.comment);
@@ -84,10 +95,10 @@ export default function ReviewsPage() {
     // Refresh
     const q2 = query(collection(db, "reviews"), where("userId", "==", user.uid));
     const snap2 = await getDocs(q2);
-    setReviews(snap2.docs.map(doc => doc.data()));
+    setReviews(snap2.docs.map(doc => doc.data() as Review));
   };
 
-  const handleDelete = async (review: any) => {
+  const handleDelete = async (review: Review) => {
     if (!user || !db) return;
     // Yorumu bul
     const q = query(collection(db, "reviews"), where("userId", "==", user.uid), where("createdAt", "==", review.createdAt));
@@ -105,7 +116,7 @@ export default function ReviewsPage() {
     // Refresh
     const q2 = query(collection(db, "reviews"), where("userId", "==", user.uid));
     const snap2 = await getDocs(q2);
-    setReviews(snap2.docs.map(doc => doc.data()));
+    setReviews(snap2.docs.map(doc => doc.data() as Review));
   };
 
   if (!loading && !user) {
@@ -131,7 +142,7 @@ export default function ReviewsPage() {
               <div key={i} className="bg-black/70 rounded-2xl border-2 border-yellow-700 shadow-xl flex flex-col items-center p-6 relative mb-8">
                 {product && (
                   <>
-                    <img src={product.img} alt={product.name.tr} className="w-32 h-32 object-contain mb-2 rounded" />
+                    <Image src={product.img} alt={product.name.tr} width={128} height={128} className="w-32 h-32 object-contain mb-2 rounded" />
                     <h3 className="font-[Ringbearer] text-2xl text-yellow-300 mb-1 drop-shadow-[0_0_10px_gold]">{product.name.tr}</h3>
                     <div className="text-yellow-400 font-bold text-lg mb-1">{product.price}</div>
                     <div className="text-gray-200 text-center text-base mb-2">{product.desc.tr}</div>
@@ -139,7 +150,7 @@ export default function ReviewsPage() {
                 )}
                 <span className="text-yellow-500 text-lg mb-1">{r.rating} ★</span>
                 <div className="text-yellow-100 text-sm mb-2">{r.comment}</div>
-                {r.imageUrl && <img src={r.imageUrl} alt="yorum görseli" className="mb-2 max-h-32 rounded" />}
+                {r.imageUrl && <Image src={r.imageUrl} alt="yorum görseli" width={128} height={128} className="mb-2 max-h-32 rounded object-contain" />}
                 <span className="text-yellow-200 text-xs">{r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleString() : ''}</span>
                 <div className="flex gap-2 mt-2">
                   <button onClick={() => handleEdit(r)} className="px-3 py-1 bg-yellow-500 text-black rounded hover:bg-yellow-600">Düzenle</button>
@@ -178,7 +189,7 @@ export default function ReviewsPage() {
               className="mb-2 text-black"
             />
             {editPreview && (
-              <img src={editPreview} alt="Önizleme" className="mb-2 max-h-32 rounded" />
+              <Image src={editPreview} alt="Önizleme" width={128} height={128} className="mb-2 max-h-32 rounded object-contain" />
             )}
             <button
               className="w-full mt-4 py-2 bg-yellow-500 text-black font-bold rounded hover:bg-yellow-600 transition"
