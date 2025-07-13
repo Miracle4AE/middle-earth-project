@@ -11,6 +11,7 @@ export default function CartPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const c: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     setCart(c);
     let t = 0;
@@ -23,7 +24,9 @@ export default function CartPage() {
 
   const updateCart = (newCart: CartItem[]) => {
     setCart(newCart);
-    localStorage.setItem("lotr-cart", JSON.stringify(newCart));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("lotr-cart", JSON.stringify(newCart));
+    }
     let t = 0;
     newCart.forEach((item: CartItem) => {
       const price = parseInt(item.price.replace(/[^0-9]/g, ""));

@@ -25,9 +25,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUserState(user);
       setLoading(false);
-      if (user) {
+      if (user && typeof window !== 'undefined') {
         localStorage.setItem("lotr-current-user", JSON.stringify(user));
-      } else {
+      } else if (typeof window !== 'undefined') {
         localStorage.removeItem("lotr-current-user");
       }
     });
@@ -36,10 +36,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const setUser = (user: User | null) => {
     setUserState(user);
-    if (user) {
-      localStorage.setItem("lotr-current-user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("lotr-current-user");
+    if (typeof window !== 'undefined') {
+      if (user) {
+        localStorage.setItem("lotr-current-user", JSON.stringify(user));
+      } else {
+        localStorage.removeItem("lotr-current-user");
+      }
     }
   };
 

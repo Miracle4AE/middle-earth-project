@@ -186,17 +186,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // LocalStorage'dan dil tercihini al
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && (savedLanguage === 'tr' || savedLanguage === 'en')) {
-      setLanguageState(savedLanguage);
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('language') as Language;
+      if (savedLanguage && (savedLanguage === 'tr' || savedLanguage === 'en')) {
+        setLanguageState(savedLanguage);
+      }
     }
   }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('language', lang);
-    // HTML lang attribute'unu güncelle
-    document.documentElement.lang = lang;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('language', lang);
+      // HTML lang attribute'unu güncelle
+      document.documentElement.lang = lang;
+    }
   };
 
   const t = (key: string): string => {

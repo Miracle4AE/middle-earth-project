@@ -215,6 +215,8 @@ export default function ShopPage() {
       return;
     }
     if (!imgRef.current) return;
+    if (typeof window === 'undefined') return;
+    
     const cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     const existingIndex = cart.findIndex(
       (item) => item.name === product.name.tr && item.category === selected
@@ -245,6 +247,8 @@ export default function ShopPage() {
       alert("Satın almak için giriş yapmalısın!");
       return;
     }
+    if (typeof window === 'undefined') return;
+    
     const cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     const existingIndex = cart.findIndex(
       (item) => item.name === product.name.tr && item.category === selected

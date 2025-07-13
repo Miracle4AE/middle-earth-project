@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const c: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
     setCart(c);
     let t = 0;
@@ -47,7 +48,9 @@ export default function CheckoutPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(true);
-    localStorage.removeItem("lotr-cart");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("lotr-cart");
+    }
     setCart([]);
   };
 

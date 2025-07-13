@@ -115,18 +115,21 @@ export default function Navbar() {
 
   useEffect(() => {
     const updateCartCount = () => {
+      if (typeof window === 'undefined') return;
       const cart: { quantity?: number }[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
       const total = cart.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 1), 0);
       setCartCount(total);
     };
     updateCartCount();
-    window.addEventListener("storage", updateCartCount);
-    // Sepete ekleme sonrası da güncellenmesi için interval ekle
-    const interval = setInterval(updateCartCount, 500);
-    return () => {
-      window.removeEventListener("storage", updateCartCount);
-      clearInterval(interval);
-    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener("storage", updateCartCount);
+      // Sepete ekleme sonrası da güncellenmesi için interval ekle
+      const interval = setInterval(updateCartCount, 500);
+      return () => {
+        window.removeEventListener("storage", updateCartCount);
+        clearInterval(interval);
+      };
+    }
   }, []);
 
   const handleLogout = async () => {
