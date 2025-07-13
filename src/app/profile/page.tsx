@@ -6,6 +6,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { Firestore } from "firebase/firestore";
+import { useLanguage } from "../LanguageContext";
 
 interface Address {
   title: string;
@@ -18,6 +19,7 @@ interface Address {
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState("info");
 
   // Üyelik Bilgilerim
@@ -285,49 +287,48 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8">
-      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">Kullanıcı Bilgilerim</h1>
+      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">{t('profile_info')}</h1>
       <div className="flex gap-4 mb-8 flex-wrap">
-        <button onClick={() => setActiveTab("info")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "info" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>Üyelik Bilgilerim</button>
-        <button onClick={() => setActiveTab("password")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "password" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>Şifre Değişikliği</button>
-        <button onClick={() => setActiveTab("prefs")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "prefs" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>İletişim Tercihlerim</button>
-        <button onClick={() => setActiveTab("addresses")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "addresses" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>Adreslerim</button>
-        <button onClick={() => setActiveTab("update")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "update" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>Bilgilerimi Güncelle</button>
+        <button onClick={() => setActiveTab("info")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "info" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>{t('profile_tab_info')}</button>
+        <button onClick={() => setActiveTab("password")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "password" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>{t('profile_tab_password')}</button>
+        <button onClick={() => setActiveTab("prefs")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "prefs" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>{t('profile_tab_prefs')}</button>
+        <button onClick={() => setActiveTab("addresses")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "addresses" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>{t('profile_tab_addresses')}</button>
+        <button onClick={() => setActiveTab("update")} className={`px-6 py-2 rounded-t-lg font-bold border-b-4 ${activeTab === "update" ? "border-yellow-400 bg-yellow-900/30 text-yellow-300" : "border-transparent bg-black/60 text-yellow-100"}`}>{t('profile_tab_update')}</button>
       </div>
       {activeTab === "info" && (
         <div className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
-          <input name="firstName" value={form.firstName} readOnly placeholder="Ad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-          <input name="lastName" value={form.lastName} readOnly placeholder="Soyad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-          <label className="text-yellow-200 text-sm">Doğum Tarihi</label>
+          <input name="firstName" value={form.firstName} readOnly placeholder={t('first_name')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+          <input name="lastName" value={form.lastName} readOnly placeholder={t('last_name')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+          <label className="text-yellow-200 text-sm">{t('birth_date')}</label>
           <input type="date" name="birthDate" value={form.birthDate} readOnly className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
           <select name="gender" value={form.gender} disabled className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100">
-            <option value="">Cinsiyet (seçiniz)</option>
-            <option value="Erkek">Erkek</option>
-            <option value="Kadın">Kadın</option>
-            <option value="Diğer">Diğer</option>
+            <option value="">{t('gender_select')}</option>
+            <option value="Erkek">{t('gender_male')}</option>
+            <option value="Kadın">{t('gender_female')}</option>
+            <option value="Diğer">{t('gender_other')}</option>
           </select>
-          <input name="phone" value={form.phone} readOnly placeholder="Telefon Numarası" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-          <input name="email" value={form.email} readOnly placeholder="Mail Adresi" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
-          <div className="text-yellow-400 text-center text-sm mt-2">Bilgiler sadece ilk kayıt sırasında doldurulabilir. Güncellemek için &quot;Bilgilerimi Güncelle&quot; sekmesini kullan.</div>
+          <input name="phone" value={form.phone} readOnly placeholder={t('phone_number')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+          <input name="email" value={form.email} readOnly placeholder={t('email_address')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
+          <div className="text-yellow-400 text-center text-sm mt-2">{t('profile_info_note')}</div>
         </div>
       )}
       {activeTab === "addresses" && (
         <div className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-6 w-full max-w-md">
           <form onSubmit={handleAddAddress} className="flex flex-col gap-4">
-            <input name="title" value={addressForm.title} onChange={handleAddressChange} placeholder="Adres Başlığı" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+            <input name="title" value={addressForm.title} onChange={handleAddressChange} placeholder={t('address_title')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
             <select name="country" value={addressForm.country} onChange={handleAddressChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100">
-              <option value="Türkiye">Türkiye</option>
-              {/* Diğer ülkeler eklenebilir */}
+              <option value="Türkiye">{t('country_turkey')}</option>
             </select>
-            <input name="city" value={addressForm.city} onChange={handleAddressChange} placeholder="Şehir" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-            <input name="district" value={addressForm.district} onChange={handleAddressChange} placeholder="İlçe" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-            <textarea name="address" value={addressForm.address} onChange={handleAddressChange} placeholder="Açık Adres" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100 resize-none" required rows={3} />
-            <button type="submit" disabled={addressLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{addressLoading ? "Ekleniyor..." : "Ekle"}</button>
+            <input name="city" value={addressForm.city} onChange={handleAddressChange} placeholder={t('city')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+            <input name="district" value={addressForm.district} onChange={handleAddressChange} placeholder={t('district')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+            <textarea name="address" value={addressForm.address} onChange={handleAddressChange} placeholder={t('address_detail')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100 resize-none" required rows={3} />
+            <button type="submit" disabled={addressLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{addressLoading ? t('adding') : t('add')}</button>
             {addressMsg && <div className="text-green-400 text-center mt-2">{addressMsg}</div>}
           </form>
           <div className="mt-6">
-            <div className="text-yellow-300 font-bold mb-2">Kayıtlı Adresler:</div>
+            <div className="text-yellow-300 font-bold mb-2">{t('saved_addresses')}</div>
             {addresses.length === 0 ? (
-              <div className="text-yellow-200">Henüz adres eklemediniz.</div>
+              <div className="text-yellow-200">{t('no_addresses')}</div>
             ) : (
               <ul className="flex flex-col gap-2">
                 {addresses.map((ad, idx) => (
@@ -337,7 +338,7 @@ export default function ProfilePage() {
                       <div className="text-yellow-200 text-sm">{ad.country}, {ad.city}, {ad.district}</div>
                       <div className="text-yellow-100 text-xs">{ad.address}</div>
                     </div>
-                    <button onClick={() => handleDeleteAddress(idx)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition">Sil</button>
+                    <button onClick={() => handleDeleteAddress(idx)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition">{t('delete')}</button>
                   </li>
                 ))}
               </ul>
@@ -349,27 +350,27 @@ export default function ProfilePage() {
         <div className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-6 w-full max-w-md">
           {updateStep === 0 ? (
             <form onSubmit={handleUpdateCheck} className="flex flex-col gap-4">
-              <input type="email" value={updateEmail} onChange={e => setUpdateEmail(e.target.value)} placeholder="Mail Adresi" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <input type="password" value={updatePwd} onChange={e => setUpdatePwd(e.target.value)} placeholder="Şifre" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <button type="submit" disabled={updateLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{updateLoading ? "Doğrulanıyor..." : "Devam Et"}</button>
+              <input type="email" value={updateEmail} onChange={e => setUpdateEmail(e.target.value)} placeholder={t('email_address')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <input type="password" value={updatePwd} onChange={e => setUpdatePwd(e.target.value)} placeholder={t('password')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <button type="submit" disabled={updateLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{updateLoading ? t('verifying') : t('continue')}</button>
               {updateError && <div className="text-red-500 text-center mt-2">{updateError}</div>}
               {updateMsg && <div className="text-green-400 text-center mt-2">{updateMsg}</div>}
             </form>
           ) : (
             <form onSubmit={handleUpdateSave} className="flex flex-col gap-4">
-              <input name="firstName" value={updateForm.firstName} onChange={handleUpdateChange} placeholder="Ad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <input name="lastName" value={updateForm.lastName} onChange={handleUpdateChange} placeholder="Soyad" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <label className="text-yellow-200 text-sm">Doğum Tarihi</label>
+              <input name="firstName" value={updateForm.firstName} onChange={handleUpdateChange} placeholder={t('first_name')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <input name="lastName" value={updateForm.lastName} onChange={handleUpdateChange} placeholder={t('last_name')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <label className="text-yellow-200 text-sm">{t('birth_date')}</label>
               <input type="date" name="birthDate" value={updateForm.birthDate} onChange={handleUpdateChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" />
               <select name="gender" value={updateForm.gender} onChange={handleUpdateChange} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100">
-                <option value="">Cinsiyet (seçiniz)</option>
-                <option value="Erkek">Erkek</option>
-                <option value="Kadın">Kadın</option>
-                <option value="Diğer">Diğer</option>
+                <option value="">{t('gender_select')}</option>
+                <option value="Erkek">{t('gender_male')}</option>
+                <option value="Kadın">{t('gender_female')}</option>
+                <option value="Diğer">{t('gender_other')}</option>
               </select>
-              <input name="phone" value={updateForm.phone} onChange={handleUpdateChange} placeholder="Telefon Numarası" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <input name="email" value={updateForm.email} onChange={handleUpdateChange} placeholder="Mail Adresi" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <button type="submit" disabled={updateLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{updateLoading ? "Güncelleniyor..." : "Güncelle"}</button>
+              <input name="phone" value={updateForm.phone} onChange={handleUpdateChange} placeholder={t('phone_number')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <input name="email" value={updateForm.email} onChange={handleUpdateChange} placeholder={t('email_address')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <button type="submit" disabled={updateLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{updateLoading ? t('updating') : t('update')}</button>
               {updateError && <div className="text-red-500 text-center mt-2">{updateError}</div>}
               {updateMsg && <div className="text-green-400 text-center mt-2">{updateMsg}</div>}
             </form>
@@ -380,13 +381,13 @@ export default function ProfilePage() {
         <form onSubmit={passwordStep === 0 ? handlePasswordCheck : handlePasswordUpdate} className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-4 w-full max-w-md">
           {passwordStep === 0 ? (
             <>
-              <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Mevcut Şifre" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <button type="submit" disabled={passwordLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{passwordLoading ? "Kontrol Ediliyor..." : "Devam Et"}</button>
+              <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder={t('current_password')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <button type="submit" disabled={passwordLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{passwordLoading ? t('checking') : t('continue')}</button>
             </>
           ) : (
             <>
-              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Yeni Şifre" className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
-              <button type="submit" disabled={passwordLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{passwordLoading ? "Güncelleniyor..." : "Güncelle"}</button>
+              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder={t('new_password')} className="p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100" required />
+              <button type="submit" disabled={passwordLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{passwordLoading ? t('updating') : t('update')}</button>
             </>
           )}
           {passwordMsg && <div className="text-green-400 text-center mt-2">{passwordMsg}</div>}
@@ -396,7 +397,7 @@ export default function ProfilePage() {
       {activeTab === "prefs" && (
         <div className="bg-black/80 border-2 border-yellow-700 rounded-xl shadow-2xl p-8 flex flex-col gap-6 w-full max-w-md">
           <div className="flex items-center justify-between">
-            <span className="text-yellow-200">Anlık/Kısa Mesaj Kanalları</span>
+            <span className="text-yellow-200">{t('sms_channel')}</span>
             <button onClick={() => handlePrefChange("sms")}
               className={`w-12 h-6 rounded-full ${prefs.sms ? "bg-yellow-400" : "bg-gray-600"} relative transition-all`}
             >
@@ -404,7 +405,7 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-yellow-200">E-Posta</span>
+            <span className="text-yellow-200">{t('email_channel')}</span>
             <button onClick={() => handlePrefChange("email")}
               className={`w-12 h-6 rounded-full ${prefs.email ? "bg-yellow-400" : "bg-gray-600"} relative transition-all`}
             >
@@ -412,14 +413,14 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-yellow-200">Telefon Araması</span>
+            <span className="text-yellow-200">{t('phone_channel')}</span>
             <button onClick={() => handlePrefChange("phone")}
               className={`w-12 h-6 rounded-full ${prefs.phone ? "bg-yellow-400" : "bg-gray-600"} relative transition-all`}
             >
               <span className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-black transition-all ${prefs.phone ? "translate-x-6" : ""}`}></span>
             </button>
           </div>
-          <button onClick={handlePrefsSave} disabled={prefsLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{prefsLoading ? "Kaydediliyor..." : "Kaydet"}</button>
+          <button onClick={handlePrefsSave} disabled={prefsLoading} className="bg-yellow-400 text-black font-bold py-2 rounded mt-4 hover:bg-yellow-500 transition disabled:bg-gray-500">{prefsLoading ? t('saving') : t('save')}</button>
           {prefsMsg && <div className="text-green-400 text-center mt-2">{prefsMsg}</div>}
         </div>
       )}

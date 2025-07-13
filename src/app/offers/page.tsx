@@ -4,6 +4,7 @@ import { useAuth } from "../AuthContext";
 import { useRouter } from "next/navigation";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
+import { useLanguage } from "../LanguageContext";
 
 interface Offer {
   id: string;
@@ -20,6 +21,7 @@ interface Offer {
 export default function OffersPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
 
@@ -45,8 +47,10 @@ export default function OffersPage() {
             setOffers([
               {
                 id: "1",
-                title: "🎁 İlk Siparişinize %20 İndirim!",
-                description: "İlk siparişinizde tüm ürünlerde %20 indirim fırsatı. Bu fırsatı kaçırmayın!",
+                title: language === "en" ? "🎁 20% Off Your First Order!" : "🎁 İlk Siparişinize %20 İndirim!",
+                description: language === "en"
+                  ? "Get 20% off on all products in your first order. Don't miss this opportunity!"
+                  : "İlk siparişinizde tüm ürünlerde %20 indirim fırsatı. Bu fırsatı kaçırmayın!",
                 discount: "20%",
                 expiry: "2024-02-15",
                 code: "FIRST20",
@@ -55,19 +59,23 @@ export default function OffersPage() {
               },
               {
                 id: "2",
-                title: "⚔️ Kılıç Koleksiyonu Özel Fiyatı",
-                description: "Tüm kılıç ürünlerinde %15 indirim. Aragorn, Legolas ve Gimli kılıçları dahil.",
+                title: language === "en" ? "⚔️ Special Price for Sword Collection" : "⚔️ Kılıç Koleksiyonu Özel Fiyatı",
+                description: language === "en"
+                  ? "15% off on all sword products. Includes Aragorn, Legolas, and Gimli swords."
+                  : "Tüm kılıç ürünlerinde %15 indirim. Aragorn, Legolas ve Gimli kılıçları dahil.",
                 discount: "15%",
                 expiry: "2024-02-28",
                 code: "SWORD15",
                 type: "category",
-                category: "Kılıçlar"
+                category: language === "en" ? "Swords" : "Kılıçlar"
               },
               {
                 id: "3",
-                title: "💍 Yüzük Koleksiyonu - Ücretsiz Kargo",
-                description: "Yüzük koleksiyonundan herhangi bir ürün alın, kargo bedava!",
-                discount: "Ücretsiz Kargo",
+                title: language === "en" ? "💍 Ring Collection - Free Shipping" : "💍 Yüzük Koleksiyonu - Ücretsiz Kargo",
+                description: language === "en"
+                  ? "Buy any product from the ring collection, get free shipping!"
+                  : "Yüzük koleksiyonundan herhangi bir ürün alın, kargo bedava!",
+                discount: language === "en" ? "Free Shipping" : "Ücretsiz Kargo",
                 expiry: "2024-03-01",
                 code: "FREESHIP",
                 type: "shipping",
@@ -85,7 +93,7 @@ export default function OffersPage() {
       };
       fetchOffers();
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, language]);
 
   const getOfferTypeColor = (type: string) => {
     switch (type) {
@@ -99,24 +107,24 @@ export default function OffersPage() {
 
   const getOfferTypeText = (type: string) => {
     switch (type) {
-      case "discount": return "İndirim";
-      case "category": return "Kategori";
-      case "shipping": return "Kargo";
-      case "gift": return "Hediye";
-      default: return "Fırsat";
+      case "discount": return language === "en" ? t("discount") : t("discount");
+      case "category": return language === "en" ? t("category") : t("category");
+      case "shipping": return language === "en" ? t("shipping") : t("shipping");
+      case "gift": return language === "en" ? t("gift") : t("gift");
+      default: return language === "en" ? t("offer") : t("offer");
     }
   };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8 pt-24">
-      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">Sana Özel Fırsatlar</h1>
+      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">{t('offers')}</h1>
       
       {loadingOffers ? (
-        <div className="text-yellow-200 text-xl">Yükleniyor...</div>
+        <div className="text-yellow-200 text-xl">{t('loading')}</div>
       ) : offers.length === 0 ? (
         <div className="text-center">
-          <div className="text-yellow-200 text-xl mb-4">Şu anda sana özel bir fırsat yok.</div>
-          <div className="text-yellow-300">Yeni fırsatlar için bizi takip etmeye devam edin!</div>
+          <div className="text-yellow-200 text-xl mb-4">{t('no_offers')}</div>
+          <div className="text-yellow-300">{t('follow_for_offers')}</div>
         </div>
       ) : (
         <div className="w-full max-w-4xl flex flex-col gap-6">
@@ -142,7 +150,7 @@ export default function OffersPage() {
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 {offer.code && (
                   <div>
-                    <div className="text-yellow-300 font-semibold mb-1">Kupon Kodu:</div>
+                    <div className="text-yellow-300 font-semibold mb-1">{t('coupon_code')}:</div>
                     <div className="bg-yellow-900/30 border border-yellow-600 rounded p-2">
                       <code className="text-yellow-400 font-mono text-lg">{offer.code}</code>
                     </div>
@@ -151,7 +159,7 @@ export default function OffersPage() {
                 
                 {offer.expiry && (
                   <div>
-                    <div className="text-yellow-300 font-semibold mb-1">Son Kullanım Tarihi:</div>
+                    <div className="text-yellow-300 font-semibold mb-1">{t('expiry_date')}:</div>
                     <div className="text-yellow-200">{offer.expiry}</div>
                   </div>
                 )}
@@ -159,8 +167,8 @@ export default function OffersPage() {
               
               {offer.minAmount && (
                 <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-3 mb-4">
-                  <div className="text-yellow-300 font-semibold mb-1">Minimum Tutar:</div>
-                  <div className="text-yellow-200">{offer.minAmount}₺</div>
+                  <div className="text-yellow-300 font-semibold mb-1">{t('min_amount')}:</div>
+                  <div className="text-yellow-200">{offer.minAmount}{language === 'en' ? t('currency_usd') : t('currency_try')}</div>
                 </div>
               )}
               
@@ -169,14 +177,14 @@ export default function OffersPage() {
                   onClick={() => router.push("/shop")}
                   className="bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition"
                 >
-                  Alışverişe Başla
+                  {t('start_shopping')}
                 </button>
                 {offer.code && (
                   <button 
                     onClick={() => offer.code && navigator.clipboard.writeText(offer.code)}
                     className="bg-black border border-yellow-400 text-yellow-400 font-bold py-2 px-4 rounded hover:bg-yellow-400 hover:text-black transition"
                   >
-                    Kodu Kopyala
+                    {t('copy_code')}
                   </button>
                 )}
               </div>
@@ -187,7 +195,7 @@ export default function OffersPage() {
       
       <div className="mt-8 text-center">
         <div className="text-yellow-200 text-sm">
-          💡 Fırsatları kaçırmamak için e-posta bildirimlerini açmayı unutmayın!
+          💡 {t('offers_email_tip')}
         </div>
       </div>
     </div>

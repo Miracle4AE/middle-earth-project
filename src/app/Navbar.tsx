@@ -338,7 +338,7 @@ export default function Navbar() {
                       <Link href="/profile" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('profile_info')}</Link>
                       <Link href="/reviews" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('reviews')}</Link>
                       <Link href="/favorites" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('favorites')}</Link>
-                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('lists')}</Link>
+                      <Link href="/profile-lists" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('lists')}</Link>
                       <button onClick={handleLogout} className="px-4 py-2 text-left hover:bg-red-600 hover:text-white rounded-b-xl">{t('logout')}</button>
                     </div>
                   )}

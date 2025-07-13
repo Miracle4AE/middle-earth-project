@@ -6,12 +6,14 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import Image from "next/image";
 import { Product } from "../shop/productsData";
+import { useLanguage } from "../LanguageContext";
 
 export default function FavoritesPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [favorites, setFavorites] = useState<Product[]>([]);
   const [lang, setLang] = useState<'tr' | 'en'>('tr');
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -66,10 +68,10 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8 pt-24">
-      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">Beğendiklerim</h1>
+      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">{t('favorites')}</h1>
       <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8">
         {favorites.length === 0 ? (
-          <div className="text-yellow-200 text-center col-span-2">Henüz beğendiğiniz bir ürün yok.</div>
+          <div className="text-yellow-200 text-center col-span-2">{t('no_favorites')}</div>
         ) : (
           favorites.map((prod, i) => (
             <div key={prod.name.tr + i} className="bg-black/70 rounded-2xl border-2 border-yellow-700 shadow-xl flex flex-col items-center p-6 relative">

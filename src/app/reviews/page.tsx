@@ -7,6 +7,8 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObjec
 import { db } from '../../lib/firebase';
 import Image from "next/image";
 import { initialProducts, Product } from "../shop/productsData";
+import { useLanguage } from "../LanguageContext";
+import { parsePrice } from "../shop/productsData";
 
 type Review = {
   productName: string;
@@ -29,6 +31,10 @@ export default function ReviewsPage() {
   const [editComment, setEditComment] = useState('');
   const [editImage, setEditImage] = useState<File | null>(null);
   const [editPreview, setEditPreview] = useState<string | null>(null);
+  const { t, language } = useLanguage();
+  const [usdRate, setUsdRate] = useState<number | null>(null);
+  const [usdLoading, setUsdLoading] = useState(false);
+  const [usdError, setUsdError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !db) return;
@@ -40,6 +46,28 @@ export default function ReviewsPage() {
     };
     fetchReviews();
   }, [user]);
+
+  useEffect(() => {
+    if (language === 'en') {
+      setUsdLoading(true);
+      fetch('/api/exchange-rate')
+        .then(res => res.json())
+        .then(data => {
+          if (data && typeof data.usd === 'number' && !isNaN(data.usd)) {
+            setUsdRate(data.usd);
+            setUsdError(null);
+          } else {
+            setUsdRate(null);
+            setUsdError('Exchange rate unavailable, showing prices in ₺.');
+          }
+        })
+        .catch(() => {
+          setUsdRate(null);
+          setUsdError('Exchange rate unavailable, showing prices in ₺.');
+        })
+        .finally(() => setUsdLoading(false));
+    }
+  }, [language]);
 
   const handleEditImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -126,10 +154,10 @@ export default function ReviewsPage() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8 pt-24">
-      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">Değerlendirmelerim</h1>
+      <h1 className="font-[Ringbearer] text-4xl text-yellow-400 mb-8 drop-shadow-[0_0_20px_gold]">{t('my_reviews')}</h1>
       <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8">
         {reviews.length === 0 ? (
-          <div className="text-yellow-200 text-center col-span-2">Henüz bir yorumunuz yok.</div>
+          <div className="text-yellow-200 text-center col-span-2">{t('no_reviews')}</div>
         ) : (
           reviews.map((r, i) => {
             // Ürünü bul
@@ -142,10 +170,18 @@ export default function ReviewsPage() {
               <div key={i} className="bg-black/70 rounded-2xl border-2 border-yellow-700 shadow-xl flex flex-col items-center p-6 relative mb-8">
                 {product && (
                   <>
-                    <Image src={product.img} alt={product.name.tr} width={128} height={128} className="w-32 h-32 object-contain mb-2 rounded" />
-                    <h3 className="font-[Ringbearer] text-2xl text-yellow-300 mb-1 drop-shadow-[0_0_10px_gold]">{product.name.tr}</h3>
-                    <div className="text-yellow-400 font-bold text-lg mb-1">{product.price}</div>
-                    <div className="text-gray-200 text-center text-base mb-2">{product.desc.tr}</div>
+                    <Image src={product.img} alt={product.name[language]} width={128} height={128} className="w-32 h-32 object-contain mb-2 rounded" />
+                    <h3 className="font-[Ringbearer] text-2xl text-yellow-300 mb-1 drop-shadow-[0_0_10px_gold]">{product.name[language]}</h3>
+                    <div className="text-yellow-400 font-bold text-lg mb-1">
+                      {language === 'en'
+                        ? usdLoading
+                          ? 'Loading...'
+                          : usdRate
+                            ? `$${(parsePrice(product.price) * usdRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                            : usdError || product.price
+                        : product.price}
+                    </div>
+                    <div className="text-gray-200 text-center text-base mb-2">{product.desc[language]}</div>
                   </>
                 )}
                 <span className="text-yellow-500 text-lg mb-1">{r.rating} ★</span>
@@ -153,8 +189,8 @@ export default function ReviewsPage() {
                 {r.imageUrl && <Image src={r.imageUrl} alt="yorum görseli" width={128} height={128} className="mb-2 max-h-32 rounded object-contain" />}
                 <span className="text-yellow-200 text-xs">{r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleString() : ''}</span>
                 <div className="flex gap-2 mt-2">
-                  <button onClick={() => handleEdit(r)} className="px-3 py-1 bg-yellow-500 text-black rounded hover:bg-yellow-600">Düzenle</button>
-                  <button onClick={() => handleDelete(r)} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Sil</button>
+                  <button onClick={() => handleEdit(r)} className="px-3 py-1 bg-yellow-500 text-black rounded hover:bg-yellow-600">{t('edit') || 'Düzenle'}</button>
+                  <button onClick={() => handleDelete(r)} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">{t('delete') || 'Sil'}</button>
                 </div>
               </div>
             );
