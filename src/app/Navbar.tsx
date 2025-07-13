@@ -336,8 +336,8 @@ export default function Navbar() {
                       <Link href="/requests" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('requests')}</Link>
                       <Link href="/offers" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('offers')}</Link>
                       <Link href="/profile" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('profile_info')}</Link>
-                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('reviews')}</Link>
-                      <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('favorites')}</Link>
+                      <Link href="/reviews" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('reviews')}</Link>
+                      <Link href="/favorites" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('favorites')}</Link>
                       <Link href="#" className="px-4 py-2 hover:bg-yellow-100/10 border-b border-yellow-700">{t('lists')}</Link>
                       <button onClick={handleLogout} className="px-4 py-2 text-left hover:bg-red-600 hover:text-white rounded-b-xl">{t('logout')}</button>
                     </div>
@@ -572,8 +572,8 @@ export default function Navbar() {
                       <Link href="/requests" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('requests')}</Link>
                       <Link href="/offers" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('offers')}</Link>
                       <Link href="/profile" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('profile_info')}</Link>
-                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('reviews')}</Link>
-                      <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('favorites')}</Link>
+                      <Link href="/reviews" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('reviews')}</Link>
+                      <Link href="/favorites" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('favorites')}</Link>
                       <Link href="#" className="block hover:bg-yellow-100/10 py-2 px-2 rounded" onClick={() => setMobileMenuOpen(false)}>{t('lists')}</Link>
                       <button onClick={handleLogout} className="w-full text-left hover:bg-red-600 hover:text-white py-2 px-2 rounded mt-2">{t('logout')}</button>
                     </>

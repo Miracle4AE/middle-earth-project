@@ -4,6 +4,22 @@ import { useAuth } from "../AuthContext";
 import { useRouter } from "next/navigation";
 import { addDoc, collection, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from '../../lib/firebase';
+import { Timestamp } from "firebase/firestore";
+
+// Firestore'dan gelen request objesi tipi
+interface Request {
+  id: string;
+  userId: string;
+  category: string;
+  subject: string;
+  message: string;
+  priority: string;
+  status: string;
+  createdAt?: Timestamp;
+  userEmail?: string;
+  userName?: string;
+  reply?: string;
+}
 
 export default function RequestsPage() {
   const { user, loading } = useAuth();
@@ -17,7 +33,7 @@ export default function RequestsPage() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
-  const [userRequests, setUserRequests] = useState<any[]>([]);
+  const [userRequests, setUserRequests] = useState<Request[]>([]);
 
   useEffect(() => {
     if (!user || !db) return;
@@ -28,10 +44,10 @@ export default function RequestsPage() {
         orderBy("createdAt", "desc")
       );
       const snap = await getDocs(q);
-      setUserRequests(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setUserRequests(snap.docs.map((doc: import("firebase/firestore").QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() } as Request)));
     };
     fetchRequests();
-  }, [user, db, success]);
+  }, [user, success]);
 
   if (!loading && !user) {
     router.push("/login");
