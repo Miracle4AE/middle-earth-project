@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import { useRouter } from "next/navigation";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 
 export default function RequestsPage() {
@@ -17,6 +17,21 @@ export default function RequestsPage() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
+  const [userRequests, setUserRequests] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user || !db) return;
+    const fetchRequests = async () => {
+      const q = query(
+        collection(db!, "requests"),
+        where("userId", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
+      const snap = await getDocs(q);
+      setUserRequests(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    };
+    fetchRequests();
+  }, [user, db, success]);
 
   if (!loading && !user) {
     router.push("/login");
@@ -165,6 +180,34 @@ export default function RequestsPage() {
             <p>📞 Telefon: +90 212 555 0123</p>
             <p>🕒 Çalışma Saatleri: Pazartesi - Cuma, 09:00 - 18:00</p>
           </div>
+        </div>
+
+        {/* Kullanıcının geçmiş talepleri ve admin yanıtı */}
+        <div className="mt-10">
+          <h2 className="text-yellow-300 text-xl font-bold mb-4">Geçmiş Talepleriniz</h2>
+          {userRequests.length === 0 ? (
+            <div className="text-yellow-200 text-center">Henüz bir soru veya talebiniz yok.</div>
+          ) : (
+            userRequests.map((request) => (
+              <div key={request.id} className="bg-black/70 border border-yellow-700 rounded-xl p-4 mb-4">
+                <div className="flex justify-between items-center mb-1">
+                  <div>
+                    <b>Konu:</b> {request.subject} <span className={`ml-2 px-2 py-1 rounded text-xs font-bold ${request.status === "Yanıtlandı" ? "bg-green-600 text-white" : "bg-yellow-600 text-white"}`}>{request.status || "Beklemede"}</span>
+                  </div>
+                  <div className="text-yellow-300 text-xs">{request.createdAt && request.createdAt.toDate ? request.createdAt.toDate().toLocaleDateString() : "-"}</div>
+                </div>
+                <div className="bg-black/40 rounded-lg p-2 mb-2">
+                  <b>Mesajınız:</b>
+                  <div className="text-yellow-200">{request.message}</div>
+                </div>
+                {request.reply && (
+                  <div className="mt-2 p-2 bg-green-900/30 border border-green-700 rounded text-green-300">
+                    <b>Yanıt:</b> {request.reply}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
