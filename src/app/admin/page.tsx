@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { sendPasswordResetEmail } from "firebase/auth";
@@ -68,6 +68,7 @@ interface Request {
   priority: string;
   status?: string;
   createdAt?: Timestamp;
+  reply?: string; // Yeni eklenen alan
 }
 
 export default function AdminPage() {
@@ -117,6 +118,9 @@ export default function AdminPage() {
 
   // Soru/Talep yönetimi
   const [requests, setRequests] = useState<Request[]>([]);
+  const [replyingId, setReplyingId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const replyInputRef = useRef<HTMLInputElement>(null);
 
   // Toplu fırsat yönetimi
   const [bulkOfferForm, setBulkOfferForm] = useState({
@@ -396,6 +400,33 @@ export default function AdminPage() {
     } catch {
       alert("Şifre sıfırlama maili gönderilemedi. Lütfen e-posta adresini kontrol et.");
     }
+  };
+
+  // Yanıtlandı olarak işaretle fonksiyonu
+  const handleMarkAsAnswered = async (requestId: string) => {
+    if (!db) return;
+    await updateDoc(doc(db, "requests", requestId), { status: "Yanıtlandı" });
+    loadRequests();
+  };
+
+  // Yanıtla fonksiyonu (örnek: modal açar)
+  const handleReply = (requestId: string) => {
+    setReplyingId(requestId);
+    setReplyText("");
+    setTimeout(() => {
+      replyInputRef.current?.focus();
+    }, 100);
+  };
+
+  // Yanıtı gönder fonksiyonu (örnek: Firestore'a ekleyebilirsin veya başka bir işlem yapabilirsin)
+  const handleSendReply = async (requestId: string) => {
+    if (!db || !replyText.trim()) return;
+    // Burada örnek olarak yanıtı ayrı bir collection'a ekleyebilirsin veya request'e ekleyebilirsin
+    // Şimdilik sadece status'u güncelliyoruz ve modalı kapatıyoruz
+    await updateDoc(doc(db, "requests", requestId), { status: "Yanıtlandı", reply: replyText });
+    setReplyingId(null);
+    setReplyText("");
+    loadRequests();
   };
 
   if (!isLoggedIn) {
@@ -939,15 +970,53 @@ export default function AdminPage() {
                   </div>
                   <div className="bg-black/40 rounded-lg p-3">
                     <p className="text-yellow-200">{request.message}</p>
+                    {request.reply && (
+                      <div className="mt-2 p-2 bg-green-900/30 border border-green-700 rounded text-green-300">
+                        <b>Yanıt:</b> {request.reply}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
+                    <button
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                      onClick={() => handleReply(request.id)}
+                    >
                       Yanıtla
                     </button>
-                    <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                    <button
+                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                      onClick={() => handleMarkAsAnswered(request.id)}
+                    >
                       Yanıtlandı Olarak İşaretle
                     </button>
                   </div>
+                  {/* Yanıtla modalı */}
+                  {replyingId === request.id && (
+                    <div className="mt-4 p-4 bg-black/80 border border-yellow-700 rounded-xl">
+                      <input
+                        ref={replyInputRef}
+                        type="text"
+                        value={replyText}
+                        onChange={e => setReplyText(e.target.value)}
+                        placeholder="Yanıtınızı yazın..."
+                        className="w-full p-2 rounded bg-black/60 border border-yellow-700 text-yellow-100 mb-2"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                          onClick={() => handleSendReply(request.id)}
+                        >
+                          Yanıtı Gönder
+                        </button>
+                        <button
+                          className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition"
+                          onClick={() => setReplyingId(null)}
+                        >
+                          İptal
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
