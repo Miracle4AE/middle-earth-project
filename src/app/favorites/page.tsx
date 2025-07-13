@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import Image from "next/image";
-
-interface Product {
-  name: { tr: string; en: string };
-  price: string;
-  img: string;
-  desc: { tr: string; en: string };
-  category: string;
-}
+import { Product } from "../shop/productsData";
 
 export default function FavoritesPage() {
   const { user, loading } = useAuth();

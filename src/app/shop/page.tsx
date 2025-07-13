@@ -10,6 +10,7 @@ import { doc, updateDoc, getDoc, query, where, getDocs } from "firebase/firestor
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import StarIcon from "../StarIcon";
+import { initialProducts, Product, parsePrice } from "./productsData";
 
 const categories = [
   { key: "rings" },
@@ -39,7 +40,6 @@ const categories = [
   { key: "plush_toys" },
 ];
 
-type Product = { name: { tr: string; en: string }; price: string; img: string; desc: { tr: string; en: string }; category: string };
 type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
 
 // Review tipi
@@ -53,121 +53,6 @@ type Review = {
   imageUrl?: string;
   createdAt?: { toDate: () => Date };
 };
-
-export const initialProducts: Record<string, Product[]> = {
-  rings: [
-    { name: { tr: "Tek Yüzük", en: "The One Ring" }, price: "99.999₺", img: "/images/one-ring.png", desc: { tr: "Sauron'un kudretiyle dövülmüş efsanevi yüzük.", en: "The legendary ring forged by Sauron's power." }, category: "rings" },
-    { name: { tr: "Nenya", en: "Nenya" }, price: "49.999₺", img: "/images/gallery/galadriel.jpg", desc: { tr: "Galadriel'in yüzüğü, saflığın ve gücün simgesi.", en: "Galadriel's ring, symbol of purity and power." }, category: "rings" },
-  ],
-  swords: [
-    { name: { tr: "Andúril", en: "Andúril" }, price: "79.999₺", img: "/images/gallery/aragorn.jpg", desc: { tr: "Aragorn'un efsanevi kılıcı.", en: "Aragorn's legendary sword." }, category: "swords" },
-    { name: { tr: "Sting", en: "Sting" }, price: "29.999₺", img: "/images/gallery/frodo.jpg", desc: { tr: "Frodo'nun mavi parlayan kılıcı.", en: "Frodo's blue-glowing sword." }, category: "swords" },
-    { name: { tr: "Glamdring", en: "Glamdring" }, price: "39.999₺", img: "/images/gallery/gandalf.jpg", desc: { tr: "Gandalf'ın kılıcı, ork avcısı.", en: "Gandalf's sword, orc hunter." }, category: "swords" },
-  ],
-  cloaks: [
-    { name: { tr: "Elf Pelerini", en: "Elf Cloak" }, price: "9.999₺", img: "/images/gallery/legolas.jpg", desc: { tr: "Görünmezlik sağlayan elf pelerini.", en: "Elven cloak that grants invisibility." }, category: "cloaks" },
-    { name: { tr: "Gri Pelerin", en: "Grey Cloak" }, price: "7.999₺", img: "/images/gallery/fellowship.jpg", desc: { tr: "Fellowship üyelerinin kullandığı pelerin.", en: "Cloak worn by Fellowship members." }, category: "cloaks" },
-  ],
-  maps: [
-    { name: { tr: "Orta Dünya Haritası", en: "Middle Earth Map" }, price: "1.999₺", img: "/images/middle-earth-map.jpg", desc: { tr: "Orta Dünya'nın detaylı haritası.", en: "Detailed map of Middle Earth." }, category: "maps" },
-    { name: { tr: "Shire Haritası", en: "Shire Map" }, price: "1.499₺", img: "/images/gallery/shire.jpg", desc: { tr: "Shire bölgesinin detaylı haritası.", en: "Detailed map of the Shire." }, category: "maps" },
-  ],
-  figures: [
-    { name: { tr: "Gandalf Figürü", en: "Gandalf Figure" }, price: "2.499₺", img: "/images/gallery/gandalf.jpg", desc: { tr: "Gandalf'ın detaylı figürü.", en: "Detailed figure of Gandalf." }, category: "figures" },
-    { name: { tr: "Frodo Figürü", en: "Frodo Figure" }, price: "2.499₺", img: "/images/gallery/frodo.jpg", desc: { tr: "Frodo'nun detaylı figürü.", en: "Detailed figure of Frodo." }, category: "figures" },
-  ],
-  elf_jewelry: [
-    { name: { tr: "Lorien Yaprağı Broşu", en: "Lorien Leaf Brooch" }, price: "999₺", img: "/images/gallery/lorien.jpg", desc: { tr: "Lorien yaprağı ile süslenmiş broş.", en: "Brooch made from Lorien leaves." }, category: "elf_jewelry" },
-    { name: { tr: "Evenstar Kolye", en: "Evenstar Necklace" }, price: "1.499₺", img: "/images/gallery/arwen.jpg", desc: { tr: "Arwen'in efsanevi kolyesi.", en: "Evenstar necklace worn by Arwen." }, category: "elf_jewelry" },
-  ],
-  books: [
-    { name: { tr: "Yüzüklerin Efendisi Seti", en: "The Lord of the Rings Trilogy" }, price: "2.499₺", img: "/images/gallery/lotr-books.jpg", desc: { tr: "J.R.R. Tolkien'in efsanevi üçlemesi.", en: "The complete trilogy of J.R.R. Tolkien's The Lord of the Rings." }, category: "books" },
-    { name: { tr: "Hobbit (İllüstrasyonlu)", en: "Hobbit (Illustrated)" }, price: "1.299₺", img: "/images/gallery/hobbit.jpg", desc: { tr: "Tolkien'in illüstrasyonlu Hobbit kitabı.", en: "Tolkien's illustrated version of the Hobbit." }, category: "books" },
-  ],
-  hobbit_items: [
-    { name: { tr: "Hobbit Kapısı Anahtarlık", en: "Hobbit Door Keychain" }, price: "299₺", img: "/images/gallery/hobbit-door.jpg", desc: { tr: "Bag End'in ikonik kapısı anahtarlık olarak.", en: "Keychain shaped like the iconic door of Bag End." }, category: "hobbit_items" },
-    { name: { tr: "Shire Kupası", en: "Shire Mug" }, price: "399₺", img: "/images/gallery/shire-cup.jpg", desc: { tr: "Shire temalı kupa.", en: "Mug with Shire theme." }, category: "hobbit_items" },
-  ],
-  elf_bows: [
-    { name: { tr: "Legolas'ın Yayı", en: "Legolas's Bow" }, price: "5.999₺", img: "/images/gallery/legolas-bow.jpg", desc: { tr: "Legolas'ın efsanevi yayı.", en: "Legolas's legendary bow." }, category: "elf_bows" },
-    { name: { tr: "Galadhrim Yayı", en: "Galadhrim Bow" }, price: "6.499₺", img: "/images/gallery/galadhrim-bow.jpg", desc: { tr: "Lothlórien elflerinin kullandığı yay.", en: "Bow used by the elves of Lothlórien." }, category: "elf_bows" },
-  ],
-  dwarf_axes: [
-    { name: { tr: "Gimli'nin Baltası", en: "Gimli's Axe" }, price: "4.999₺", img: "/images/gallery/gimli-axe.jpg", desc: { tr: "Gimli'nin efsanevi baltası.", en: "Gimli's legendary axe." }, category: "dwarf_axes" },
-    { name: { tr: "Cüce Savaş Baltası", en: "Dwarf Battle Axe" }, price: "3.999₺", img: "/images/gallery/dwarf-axe.jpg", desc: { tr: "Cüce savaşçıların kullandığı balta.", en: "Battle axe used by the dwarves." }, category: "dwarf_axes" },
-  ],
-  nazgul_masks: [
-    { name: { tr: "Nazgûl Maskesi", en: "Nazgul Mask" }, price: "2.999₺", img: "/images/gallery/nazgul-mask.jpg", desc: { tr: "Kara Süvarilerin korkutucu maskesi.", en: "Mask of the Nazgûl." }, category: "nazgul_masks" },
-    { name: { tr: "Witch-King Maskesi", en: "Witch-King Mask" }, price: "3.499₺", img: "/images/gallery/witchking-mask.jpg", desc: { tr: "Angmar'ın Cadı Kralı'nın maskesi.", en: "Mask of the Witch-King." }, category: "nazgul_masks" },
-  ],
-  orc_armors: [
-    { name: { tr: "Mordor Ork Zırhı", en: "Mordor Orc Armor" }, price: "7.999₺", img: "/images/gallery/mordor-armor.jpg", desc: { tr: "Mordor orklarından esinlenilmiş zırh.", en: "Armor inspired by the orcs of Mordor." }, category: "orc_armors" },
-    { name: { tr: "Uruk-hai Zırhı", en: "Uruk-hai Armor" }, price: "8.499₺", img: "/images/gallery/urukhai-armor.jpg", desc: { tr: "Uruk-hai savaşçılarının zırhı.", en: "Armor worn by the Uruk-hai warriors." }, category: "orc_armors" },
-  ],
-  wizard_staffs: [
-    { name: { tr: "Gandalf'ın Asası", en: "Gandalf's Staff" }, price: "3.999₺", img: "/images/gallery/gandalf-staff.jpg", desc: { tr: "Gandalf'ın büyülü asası.", en: "Gandalf's powerful staff." }, category: "wizard_staffs" },
-    { name: { tr: "Saruman'ın Asası", en: "Saruman's Staff" }, price: "4.499₺", img: "/images/gallery/saruman-staff.jpg", desc: { tr: "Saruman'ın beyaz asası.", en: "Saruman's white staff." }, category: "wizard_staffs" },
-  ],
-  gondor_helmets: [
-    { name: { tr: "Gondor Miğferi", en: "Gondor Helmets" }, price: "2.999₺", img: "/images/gallery/gondor-helmet.jpg", desc: { tr: "Gondor askerlerinin miğferi.", en: "Helmets worn by Gondor soldiers." }, category: "gondor_helmets" },
-    { name: { tr: "Faramir Miğferi", en: "Faramir Helmets" }, price: "3.499₺", img: "/images/gallery/faramir-helmet.jpg", desc: { tr: "Faramir'in kullandığı miğfer.", en: "Helmets worn by Faramir." }, category: "gondor_helmets" },
-  ],
-  rohan_horses: [
-    { name: { tr: "Rohan Atı Figürü", en: "Rohan Horse Figure" }, price: "1.999₺", img: "/images/gallery/rohan-horse.jpg", desc: { tr: "Rohan'ın efsanevi atı figürü.", en: "Rohan's legendary horse figure." }, category: "rohan_horses" },
-    { name: { tr: "Shadowfax Figürü", en: "Shadowfax Figure" }, price: "2.499₺", img: "/images/gallery/shadowfax.jpg", desc: { tr: "Gandalf'ın atı Shadowfax figürü.", en: "Shadowfax figure of Gandalf's horse." }, category: "rohan_horses" },
-  ],
-  posters: [
-    { name: { tr: "Orta Dünya Poster Seti", en: "Middle Earth Poster Set" }, price: "499₺", img: "/images/gallery/middleearth-poster.jpg", desc: { tr: "Orta Dünya temalı poster seti.", en: "Middle Earth themed poster set." }, category: "posters" },
-    { name: { tr: "Gondor Poster", en: "Gondor Poster" }, price: "299₺", img: "/images/gallery/gondor-poster.jpg", desc: { tr: "Gondor temalı poster.", en: "Gondor themed poster." }, category: "posters" },
-  ],
-  cards: [
-    { name: { tr: "LOTR Koleksiyon Kartı Seti", en: "The Lord of the Rings Collectible Card Set" }, price: "399₺", img: "/images/gallery/lotr-cards.jpg", desc: { tr: "Yüzüklerin Efendisi koleksiyon kartları.", en: "Collectible cards from The Lord of the Rings." }, category: "cards" },
-    { name: { tr: "Karakter Kartları", en: "Character Cards" }, price: "299₺", img: "/images/gallery/character-cards.jpg", desc: { tr: "Orta Dünya karakter kartları.", en: "Character cards from Middle Earth." }, category: "cards" },
-  ],
-  collection_figures: [
-    { name: { tr: "Gandalf Figürü", en: "Gandalf Figure" }, price: "2.499₺", img: "/images/gallery/gandalf.jpg", desc: { tr: "Gandalf'ın detaylı figürü.", en: "Detailed figure of Gandalf." }, category: "collection_figures" },
-    { name: { tr: "Legolas Figürü", en: "Legolas Figure" }, price: "2.499₺", img: "/images/gallery/legolas.jpg", desc: { tr: "Legolas'ın detaylı figürü.", en: "Detailed figure of Legolas." }, category: "collection_figures" },
-    { name: { tr: "Sauron Figürü", en: "Sauron Figure" }, price: "2.499₺", img: "/images/gallery/sauron.jpg", desc: { tr: "Sauron'un detaylı figürü.", en: "Detailed figure of Sauron." }, category: "collection_figures" },
-  ],
-  home_office: [
-    { name: { tr: "Orta Dünya Haritalı Battaniye", en: "Middle Earth Map Cushion" }, price: "1.999₺", img: "/images/middle-earth-map.jpg", desc: { tr: "Orta Dünya haritası ile süslenmiş battaniye.", en: "Cushion with Middle Earth map." }, category: "home_office" },
-    { name: { tr: "Orta Dünya Haritalı Yastık", en: "Middle Earth Map Throw" }, price: "999₺", img: "/images/middle-earth-map.jpg", desc: { tr: "Orta Dünya haritası ile süslenmiş yastık.", en: "Throw with Middle Earth map." }, category: "home_office" },
-  ],
-  accessories: [
-    { name: { tr: "Arwen'in Evenstar Kolyesi", en: "Arwen's Evenstar Necklace" }, price: "1.499₺", img: "/images/gallery/arwen.jpg", desc: { tr: "Arwen'in efsanevi kolyesi.", en: "Evenstar necklace worn by Arwen." }, category: "accessories" },
-    { name: { tr: "Lorien Yaprağı Broşu", en: "Lorien Leaf Brooch" }, price: "999₺", img: "/images/gallery/lorien.jpg", desc: { tr: "Lorien yaprağı ile süslenmiş broş.", en: "Brooch made from Lorien leaves." }, category: "accessories" },
-  ],
-  clothes: [
-    { name: { tr: "Prancing Pony Tişört", en: "Prancing Pony Shirt" }, price: "499₺", img: "/images/gallery/prancing-pony.jpg", desc: { tr: "Prancing Pony temalı tişört.", en: "Prancing Pony themed shirt." }, category: "clothes" },
-    { name: { tr: "Fellowship Kapüşonlu", en: "Fellowship Hooded" }, price: "999₺", img: "/images/gallery/fellowship.jpg", desc: { tr: "Fellowship temalı kapüşonlu.", en: "Fellowship themed hooded." }, category: "clothes" },
-  ],
-  games_puzzles: [
-    { name: { tr: "LOTR Masa Oyunu", en: "The Lord of the Rings Board Game" }, price: "1.499₺", img: "/images/gallery/lotr-game.jpg", desc: { tr: "LOTR temalı masa oyunu.", en: "The Lord of the Rings board game." }, category: "games_puzzles" },
-    { name: { tr: "LOTR Yapboz", en: "The Lord of the Rings Puzzle" }, price: "499₺", img: "/images/gallery/lotr-puzzle.jpg", desc: { tr: "LOTR temalı yapboz.", en: "The Lord of the Rings puzzle." }, category: "games_puzzles" },
-  ],
-  kitchen: [
-    { name: { tr: "Orta Dünya Temalı Kupa", en: "Middle Earth Mug" }, price: "299₺", img: "/images/gallery/lotr-cup.jpg", desc: { tr: "Orta Dünya temalı kupa.", en: "Mug with Middle Earth theme." }, category: "kitchen" },
-    { name: { tr: "Orta Dünya Temalı Bardak", en: "Middle Earth Glass" }, price: "299₺", img: "/images/gallery/lotr-glass.jpg", desc: { tr: "Orta Dünya temalı bardak.", en: "Glass with Middle Earth theme." }, category: "kitchen" },
-  ],
-  coins_replicas: [
-    { name: { tr: "Orta Dünya Madeni Parası", en: "Middle Earth Coin" }, price: "999₺", img: "/images/gallery/lotr-coin.jpg", desc: { tr: "Orta Dünya temalı madeni para.", en: "Middle Earth themed coin." }, category: "coins_replicas" },
-    { name: { tr: "Andúril Anahtarlık", en: "Andúril Keychain" }, price: "499₺", img: "/images/gallery/anduril-keychain.jpg", desc: { tr: "Andúril temalı anahtarlık.", en: "Andúril themed keychain." }, category: "coins_replicas" },
-  ],
-  plush_toys: [
-    { name: { tr: "Legolas Peluş", en: "Legolas Plush" }, price: "999₺", img: "/images/gallery/legolas-plush.jpg", desc: { tr: "Legolas temalı peluş.", en: "Legolas themed plush." }, category: "plush_toys" },
-    { name: { tr: "Gollum Peluş", en: "Gollum Plush" }, price: "999₺", img: "/images/gallery/gollum-plush.jpg", desc: { tr: "Gollum temalı peluş.", en: "Gollum themed plush." }, category: "plush_toys" },
-  ],
-};
-
-// Fiyatı güvenli şekilde sayıya çeviren fonksiyon
-function parsePrice(priceStr: string): number {
-  // Tüm noktaları sil (binlik ayraçları kaldır)
-  let clean = priceStr.replace(/[₺$,]/g, '').replace(/\./g, '');
-  // Virgülü ondalık ayraç olarak noktaya çevir
-  clean = clean.replace(',', '.');
-  const num = parseFloat(clean);
-  return isNaN(num) ? 0 : num;
-}
 
 export default function ShopPage() {
   const { t, language } = useLanguage();

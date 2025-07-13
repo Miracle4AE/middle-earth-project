@@ -6,7 +6,7 @@ import { doc, updateDoc, deleteDoc, getDocs, collection, query, where } from "fi
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db } from '../../lib/firebase';
 import Image from "next/image";
-import { initialProducts } from "../shop/page";
+import { initialProducts, Product } from "../shop/productsData";
 
 type Review = {
   productName: string;
@@ -17,14 +17,6 @@ type Review = {
   comment: string;
   imageUrl?: string;
   createdAt?: { toDate: () => Date };
-};
-
-type Product = {
-  name: { tr: string; en: string };
-  price: string;
-  img: string;
-  desc: { tr: string; en: string };
-  category: string;
 };
 
 export default function ReviewsPage() {
