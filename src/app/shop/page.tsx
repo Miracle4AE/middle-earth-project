@@ -11,6 +11,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import StarIcon from "../StarIcon";
 import { initialProducts, Product, parsePrice } from "./productsData";
+import Toast from "./Toast";
 
 const categories = [
   { key: "rings" },
@@ -80,6 +81,7 @@ export default function ShopPage() {
   const [showReviewsModal, setShowReviewsModal] = useState(false);
   const [selectedProductReviews, setSelectedProductReviews] = useState<Review[]>([]);
   const [selectedProductForReviews, setSelectedProductForReviews] = useState<Product | null>(null);
+  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" } | null>(null);
 
   // Ürünlere ait yorumları çek
   useEffect(() => {
@@ -269,7 +271,7 @@ export default function ShopPage() {
     setComment('');
     setImage(null);
     setPreview(null);
-    alert("Yorumun kaydedildi!");
+    setToast({ message: "Yorumun başarıyla kaydedildi!", type: "success" });
   };
 
   // Yıldız render fonksiyonu
@@ -594,6 +596,14 @@ export default function ShopPage() {
             </div>
           </div>
         </motion.div>
+      )}
+      {/* Toast Bildirimi */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </motion.div>
   );
