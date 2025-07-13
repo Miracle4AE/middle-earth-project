@@ -19,6 +19,14 @@ type Review = {
   createdAt?: { toDate: () => Date };
 };
 
+type Product = {
+  name: { tr: string; en: string };
+  price: string;
+  img: string;
+  desc: { tr: string; en: string };
+  category: string;
+};
+
 export default function ReviewsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -135,7 +143,7 @@ export default function ReviewsPage() {
             // Ürünü bul
             let product = null;
             for (const cat in initialProducts) {
-              product = initialProducts[cat].find((p: any) => p.name.tr === r.productName && p.category === r.productCategory);
+              product = (initialProducts[cat] as Product[]).find((p: Product) => p.name.tr === r.productName && p.category === r.productCategory);
               if (product) break;
             }
             return (
