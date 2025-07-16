@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import Preloader from "./Preloader";
-import Footer from "./Footer";
 import { useLanguage } from "./LanguageContext";
 
 const MotionLink = motion(Link);
@@ -1029,12 +1028,6 @@ export default function Home() {
           </motion.div>
         </div>
       </motion.div>
-      <Footer
-        onCharactersClick={scrollToCharacters}
-        onStoriesClick={scrollToStories}
-        onMapClick={scrollToMap}
-        onShopClick={scrollToShop}
-      />
     </>
   );
 }

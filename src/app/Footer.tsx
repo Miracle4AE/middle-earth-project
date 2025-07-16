@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { useLanguage } from "./LanguageContext";
 
@@ -40,6 +41,40 @@ const Footer: React.FC<FooterProps> = ({
   onShopClick,
 }) => {
   const { language } = useLanguage();
+  
+  // Eğer scroll fonksiyonları yoksa, sayfa linklerine yönlendir
+  const handleCharactersClick = () => {
+    if (onCharactersClick) {
+      onCharactersClick();
+    } else {
+      window.location.href = '/#characters-section';
+    }
+  };
+
+  const handleStoriesClick = () => {
+    if (onStoriesClick) {
+      onStoriesClick();
+    } else {
+      window.location.href = '/#stories-section';
+    }
+  };
+
+  const handleMapClick = () => {
+    if (onMapClick) {
+      onMapClick();
+    } else {
+      window.location.href = '/#map-section';
+    }
+  };
+
+  const handleShopClick = () => {
+    if (onShopClick) {
+      onShopClick();
+    } else {
+      window.location.href = '/shop';
+    }
+  };
+
   return (
     <footer className="bg-gradient-to-t from-gray-900 to-black border-t border-yellow-600/30 mt-20">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -77,25 +112,25 @@ const Footer: React.FC<FooterProps> = ({
             </h3>
             <div className="space-y-2 text-gray-300 flex flex-col items-center">
               <button
-                onClick={onCharactersClick}
+                onClick={handleCharactersClick}
                 className="block text-center hover:text-yellow-400 transition-colors bg-transparent border-none outline-none cursor-pointer py-1 px-0"
               >
                 🧝‍♂️ {texts.characters[language]}
               </button>
               <button
-                onClick={onStoriesClick}
+                onClick={handleStoriesClick}
                 className="block text-center hover:text-yellow-400 transition-colors bg-transparent border-none outline-none cursor-pointer py-1 px-0"
               >
                 📖 {texts.stories[language]}
               </button>
               <button
-                onClick={onMapClick}
+                onClick={handleMapClick}
                 className="block text-center hover:text-yellow-400 transition-colors bg-transparent border-none outline-none cursor-pointer py-1 px-0"
               >
                 🗺️ {texts.map[language]}
               </button>
               <button
-                onClick={onShopClick}
+                onClick={handleShopClick}
                 className="block text-center hover:text-yellow-400 transition-colors bg-transparent border-none outline-none cursor-pointer py-1 px-0"
               >
                 🛒 {texts.shop[language]}
