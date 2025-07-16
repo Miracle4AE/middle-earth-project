@@ -17,9 +17,6 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -65,4 +62,20 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #FFA500;
+}
+
+/* Tüm butonlar için cursor pointer */
+button, 
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.btn,
+.button {
+  cursor: pointer !important;
+}
+
+/* Link'ler için de cursor pointer */
+a {
+  cursor: pointer !important;
 }

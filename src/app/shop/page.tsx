@@ -41,7 +41,7 @@ const categories = [
   { key: "plush_toys" },
 ];
 
-type CartItem = { name: string; category: string; price: string; img: string; quantity: number };
+type CartItem = { name: string; nameEn?: string; category: string; price: string; img: string; quantity: number };
 
 // Review tipi
 type Review = {
@@ -183,7 +183,14 @@ export default function ShopPage() {
     if (existingIndex !== -1) {
       cart[existingIndex].quantity += 1;
     } else {
-      cart.push({ name: product.name[language], price: product.price, img: product.img, category: selected, quantity: 1 });
+      cart.push({ 
+        name: product.name.tr, 
+        nameEn: product.name.en,
+        price: product.price, 
+        img: product.img, 
+        category: selected, 
+        quantity: 1 
+      });
     }
     localStorage.setItem("lotr-cart", JSON.stringify(cart));
     // Animasyon başlat
@@ -215,7 +222,14 @@ export default function ShopPage() {
     if (existingIndex !== -1) {
       cart[existingIndex].quantity += 1;
     } else {
-      cart.push({ name: product.name[language], price: product.price, img: product.img, category: selected, quantity: 1 });
+      cart.push({ 
+        name: product.name.tr, 
+        nameEn: product.name.en,
+        price: product.price, 
+        img: product.img, 
+        category: selected, 
+        quantity: 1 
+      });
     }
     localStorage.setItem("lotr-cart", JSON.stringify(cart));
     router.push("/checkout");

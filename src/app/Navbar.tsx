@@ -7,6 +7,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "./LanguageContext";
+import Image from "next/image";
+import { parsePrice } from "./shop/productsData";
 
 export default function Navbar() {
   const { user, loading } = useAuth();
@@ -15,6 +17,10 @@ export default function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [cartSidebarOpen, setCartSidebarOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [cartTotal, setCartTotal] = useState(0);
+  const [usdRate, setUsdRate] = useState<number | null>(null);
   const profileBtnRef = useRef<HTMLButtonElement>(null);
   let menuTimeout: NodeJS.Timeout | null = null;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -157,6 +163,50 @@ export default function Navbar() {
     }
   }, []);
 
+  // Sepet sidebar'ı için sepet verilerini güncelle
+  useEffect(() => {
+    const updateCartData = () => {
+      if (typeof window === 'undefined') return;
+      const cart = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+      setCartItems(cart);
+      
+      let total = 0;
+      cart.forEach((item: any) => {
+        const price = parsePrice(item.price);
+        total += price * item.quantity;
+      });
+      setCartTotal(total);
+    };
+    
+    updateCartData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener("storage", updateCartData);
+      const interval = setInterval(updateCartData, 500);
+      return () => {
+        window.removeEventListener("storage", updateCartData);
+        clearInterval(interval);
+      };
+    }
+  }, []);
+
+  // USD kuru için
+  useEffect(() => {
+    if (language === 'en') {
+      fetch('/api/exchange-rate')
+        .then(res => res.json())
+        .then(data => {
+          if (data && typeof data.usd === 'number' && !isNaN(data.usd)) {
+            setUsdRate(data.usd);
+          } else {
+            setUsdRate(null);
+          }
+        })
+        .catch(() => {
+          setUsdRate(null);
+        });
+    }
+  }, [language]);
+
   const handleLogout = async () => {
     try {
       if (!auth) {
@@ -176,6 +226,61 @@ export default function Navbar() {
   };
   const handleMenuLeave = () => {
     menuTimeout = setTimeout(() => setMenuOpen(false), 200);
+  };
+
+  // Sepet sidebar fonksiyonları
+  const handleCartSidebarToggle = () => {
+    setCartSidebarOpen(!cartSidebarOpen);
+  };
+
+  const handleIncreaseQuantity = (index: number) => {
+    const newCart = [...cartItems];
+    newCart[index].quantity += 1;
+    localStorage.setItem("lotr-cart", JSON.stringify(newCart));
+    setCartItems(newCart);
+    
+    let total = 0;
+    newCart.forEach((item: any) => {
+      const price = parsePrice(item.price);
+      total += price * item.quantity;
+    });
+    setCartTotal(total);
+  };
+
+  const handleDecreaseQuantity = (index: number) => {
+    const newCart = [...cartItems];
+    if (newCart[index].quantity > 1) {
+      newCart[index].quantity -= 1;
+    } else {
+      newCart.splice(index, 1);
+    }
+    localStorage.setItem("lotr-cart", JSON.stringify(newCart));
+    setCartItems(newCart);
+    
+    let total = 0;
+    newCart.forEach((item: any) => {
+      const price = parsePrice(item.price);
+      total += price * item.quantity;
+    });
+    setCartTotal(total);
+  };
+
+  const handleRemoveItem = (index: number) => {
+    const newCart = cartItems.filter((_, i) => i !== index);
+    localStorage.setItem("lotr-cart", JSON.stringify(newCart));
+    setCartItems(newCart);
+    
+    let total = 0;
+    newCart.forEach((item: any) => {
+      const price = parsePrice(item.price);
+      total += price * item.quantity;
+    });
+    setCartTotal(total);
+  };
+
+  const handleCheckout = () => {
+    setCartSidebarOpen(false);
+    router.push("/checkout");
   };
 
   // Menü linkleri
@@ -368,22 +473,23 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-                <Link href="/cart">
-                  <button className="bg-yellow-400 text-black font-bold py-1 px-4 rounded ml-4 hover:bg-yellow-500 transition text-base md:text-lg relative flex items-center">
-                    {t('cart')}
-                    {cartCount > 0 && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                        className="ml-2 bg-red-600 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-lg border-2 border-yellow-400"
-                      >
-                        {cartCount}
-                      </motion.span>
-                    )}
-                  </button>
-                </Link>
+                <button 
+                  onClick={handleCartSidebarToggle}
+                  className="bg-yellow-400 text-black font-bold py-1 px-4 rounded ml-4 hover:bg-yellow-500 transition text-base md:text-lg relative flex items-center"
+                >
+                  {t('cart')}
+                  {cartCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="ml-2 bg-red-600 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-lg border-2 border-yellow-400"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </button>
               </>
             ) : (
               <>
@@ -439,22 +545,23 @@ export default function Navbar() {
 
         {/* Sepet butonu mobilde */}
         {!loading && user && (
-          <Link href="/cart">
-            <button className="bg-yellow-400 text-black font-bold py-1 px-2 rounded hover:bg-yellow-500 transition text-sm relative flex items-center">
-              {t('cart')}
-              {cartCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className="ml-1 bg-red-600 text-white rounded-full px-1 py-0.5 text-xs font-bold shadow-lg border border-yellow-400"
-                >
-                  {cartCount}
-                </motion.span>
-              )}
-            </button>
-          </Link>
+          <button 
+            onClick={handleCartSidebarToggle}
+            className="bg-yellow-400 text-black font-bold py-1 px-2 rounded hover:bg-yellow-500 transition text-sm relative flex items-center"
+          >
+            {t('cart')}
+            {cartCount > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="ml-1 bg-red-600 text-white rounded-full px-1 py-0.5 text-xs font-bold shadow-lg border border-yellow-400"
+              >
+                {cartCount}
+              </motion.span>
+            )}
+          </button>
         )}
         {/* Hamburger buton */}
         <button
@@ -613,6 +720,134 @@ export default function Navbar() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Sepet Sidebar */}
+      {cartSidebarOpen && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setCartSidebarOpen(false)}
+          />
+          
+          {/* Sidebar */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed top-0 right-0 h-full w-80 md:w-96 bg-black border-l-2 border-yellow-700 shadow-2xl z-50 overflow-y-auto"
+          >
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-[Ringbearer] text-2xl text-yellow-400 drop-shadow-[0_0_10px_gold]">
+                  {t('cart')}
+                </h2>
+                <button
+                  onClick={() => setCartSidebarOpen(false)}
+                  className="text-yellow-400 hover:text-yellow-300 text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Sepet İçeriği */}
+              {cartItems.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-yellow-200 text-lg mb-4">{t('no_cart_items')}</div>
+                  <button
+                    onClick={() => {
+                      setCartSidebarOpen(false);
+                      router.push('/shop');
+                    }}
+                    className="bg-yellow-400 text-black font-bold py-2 px-6 rounded hover:bg-yellow-500 transition"
+                  >
+                    {t('continue_shopping')}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Ürün Listesi */}
+                  <div className="space-y-4 mb-6">
+                    {cartItems.map((item, index) => (
+                      <div key={index} className="bg-black/60 border border-yellow-700 rounded-lg p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <Image
+                            src={item.img}
+                            alt={item.name}
+                            width={60}
+                            height={60}
+                            className="object-contain rounded border border-yellow-600"
+                          />
+                                                     <div className="flex-1">
+                             <h3 className="font-[Ringbearer] text-yellow-300 text-lg">
+                               {language === 'en' && item.nameEn ? item.nameEn : item.name}
+                             </h3>
+                             <p className="text-yellow-200 text-sm">
+                               {language === 'en' ? t(item.category) : item.category}
+                             </p>
+                            <p className="text-yellow-400 font-bold">
+                              {language === 'en' && usdRate 
+                                ? `$${(parsePrice(item.price) * usdRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                : item.price
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Miktar Kontrolleri */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleDecreaseQuantity(index)}
+                              className="bg-yellow-400 text-black w-8 h-8 rounded font-bold hover:bg-yellow-500 transition"
+                            >
+                              -
+                            </button>
+                            <span className="text-yellow-300 font-bold text-lg px-4">{item.quantity}</span>
+                            <button
+                              onClick={() => handleIncreaseQuantity(index)}
+                              className="bg-yellow-400 text-black w-8 h-8 rounded font-bold hover:bg-yellow-500 transition"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleRemoveItem(index)}
+                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm"
+                          >
+                            {t('remove_from_cart')}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Toplam ve Ödeme */}
+                  <div className="border-t border-yellow-700 pt-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-yellow-300 text-lg font-bold">{t('total')}:</span>
+                      <span className="text-yellow-400 text-xl font-bold">
+                        {language === 'en' && usdRate 
+                          ? `$${(cartTotal * usdRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          : `${cartTotal.toLocaleString()}₺`
+                        }
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleCheckout}
+                      className="w-full bg-yellow-400 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition text-lg"
+                    >
+                      {t('checkout')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        </>
       )}
     </nav>
   );
