@@ -10,6 +10,8 @@ import { useLanguage } from "./LanguageContext";
 import Image from "next/image";
 import { parsePrice } from "./shop/productsData";
 
+type CartItem = { name: string; nameEn?: string; category: string; price: string; img: string; quantity: number };
+
 export default function Navbar() {
   const { user, loading } = useAuth();
   const { language, setLanguage, t } = useLanguage();
@@ -18,7 +20,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [cartSidebarOpen, setCartSidebarOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [usdRate, setUsdRate] = useState<number | null>(null);
   const profileBtnRef = useRef<HTMLButtonElement>(null);
@@ -163,15 +165,14 @@ export default function Navbar() {
     }
   }, []);
 
-  // Sepet sidebar'ı için sepet verilerini güncelle
+  // Sepet verisini okurken de tip belirt
   useEffect(() => {
     const updateCartData = () => {
       if (typeof window === 'undefined') return;
-      const cart = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
+      const cart: CartItem[] = JSON.parse(localStorage.getItem("lotr-cart") || "[]");
       setCartItems(cart);
-      
       let total = 0;
-      cart.forEach((item: any) => {
+      cart.forEach((item: CartItem) => {
         const price = parsePrice(item.price);
         total += price * item.quantity;
       });
@@ -233,22 +234,24 @@ export default function Navbar() {
     setCartSidebarOpen(!cartSidebarOpen);
   };
 
+  // Fonksiyon parametrelerinde de CartItem kullan
   const handleIncreaseQuantity = (index: number) => {
-    const newCart = [...cartItems];
+    const newCart: CartItem[] = [...cartItems];
     newCart[index].quantity += 1;
     localStorage.setItem("lotr-cart", JSON.stringify(newCart));
     setCartItems(newCart);
     
     let total = 0;
-    newCart.forEach((item: any) => {
+    newCart.forEach((item: CartItem) => {
       const price = parsePrice(item.price);
       total += price * item.quantity;
     });
     setCartTotal(total);
   };
 
+  // Fonksiyon parametrelerinde de CartItem kullan
   const handleDecreaseQuantity = (index: number) => {
-    const newCart = [...cartItems];
+    const newCart: CartItem[] = [...cartItems];
     if (newCart[index].quantity > 1) {
       newCart[index].quantity -= 1;
     } else {
@@ -258,20 +261,21 @@ export default function Navbar() {
     setCartItems(newCart);
     
     let total = 0;
-    newCart.forEach((item: any) => {
+    newCart.forEach((item: CartItem) => {
       const price = parsePrice(item.price);
       total += price * item.quantity;
     });
     setCartTotal(total);
   };
 
+  // Fonksiyon parametrelerinde de CartItem kullan
   const handleRemoveItem = (index: number) => {
-    const newCart = cartItems.filter((_, i) => i !== index);
+    const newCart: CartItem[] = cartItems.filter((_, i) => i !== index);
     localStorage.setItem("lotr-cart", JSON.stringify(newCart));
     setCartItems(newCart);
     
     let total = 0;
-    newCart.forEach((item: any) => {
+    newCart.forEach((item: CartItem) => {
       const price = parsePrice(item.price);
       total += price * item.quantity;
     });
