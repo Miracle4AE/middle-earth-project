@@ -379,6 +379,8 @@ export default function CharactersPage() {
   const goodChars = characters.filter((c) => c.type === "good");
   const evilChars = characters.filter((c) => c.type === "evil");
 
+
+
   return (
     <div className="relative min-h-screen w-full">
       {/* Sabit arka plan yüzük görseli */}

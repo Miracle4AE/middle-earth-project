@@ -60,56 +60,81 @@ export default function Navbar() {
   // Smooth scroll fonksiyonları
   const scrollToCharacters = (e: React.MouseEvent) => {
     e.preventDefault();
-    const element = document.getElementById('characters-section');
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    // Eğer ana sayfada değilsek, ana sayfaya git
+    if (pathname !== '/') {
+      router.push('/#characters');
+    } else {
+      const element = document.getElementById('characters-section');
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   };
 
   const scrollToStories = (e: React.MouseEvent) => {
     e.preventDefault();
-    const element = document.getElementById('stories-section');
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    // Eğer ana sayfada değilsek, ana sayfaya git
+    if (pathname !== '/') {
+      router.push('/#stories');
+    } else {
+      const element = document.getElementById('stories-section');
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   };
 
   const scrollToGallery = (e: React.MouseEvent) => {
     e.preventDefault();
-    const element = document.getElementById('gallery-section');
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    // Eğer ana sayfada değilsek, ana sayfaya git
+    if (pathname !== '/') {
+      router.push('/#gallery');
+    } else {
+      const element = document.getElementById('gallery-section');
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   };
 
   const scrollToMap = (e: React.MouseEvent) => {
     e.preventDefault();
-    const element = document.getElementById('map-section');
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    // Eğer ana sayfada değilsek, ana sayfaya git
+    if (pathname !== '/') {
+      router.push('/#map');
+    } else {
+      const element = document.getElementById('map-section');
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   };
 
   const scrollToShop = (e: React.MouseEvent) => {
     e.preventDefault();
-    const element = document.getElementById('shop-section');
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    // Eğer ana sayfada değilsek, ana sayfaya git
+    if (pathname !== '/') {
+      router.push('/#shop');
+    } else {
+      const element = document.getElementById('shop-section');
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   };
 

@@ -342,12 +342,33 @@ export default function Home() {
     }
   };
 
-  // URL'den karakterler bölümüne scroll kontrolü
+  // URL'den hash ile gelen bölümlere scroll kontrolü
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hash === '#characters') {
+    if (typeof window !== 'undefined' && isLoaded) {
+      const hash = window.location.hash;
+      const scrollDelay = 1500; // Sayfa yüklendikten sonra biraz bekle
+      
       setTimeout(() => {
-        scrollToCharacters();
-      }, 1000);
+        switch (hash) {
+          case '#characters':
+            scrollToCharacters();
+            break;
+          case '#stories':
+            scrollToStories();
+            break;
+          case '#gallery':
+            scrollToGallery();
+            break;
+          case '#map':
+            scrollToMap();
+            break;
+          case '#shop':
+            scrollToShop();
+            break;
+          default:
+            break;
+        }
+      }, scrollDelay);
     }
   }, [isLoaded]);
 
