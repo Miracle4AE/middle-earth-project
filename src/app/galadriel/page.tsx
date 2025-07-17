@@ -49,7 +49,7 @@ export default function GaladrielPage() {
             className="bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-white mb-4 italic">
-              "{t('galadriel_quote')}"
+              &ldquo;{t('galadriel_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-gray-300 font-semibold">- {t('galadriel_quote_author')}</p>
           </motion.div>

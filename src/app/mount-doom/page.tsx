@@ -48,7 +48,7 @@ export default function MountDoomPage() {
             className="bg-black/80 backdrop-blur-xl rounded-2xl border-2 border-red-700 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-red-300 mb-4 italic">
-              "{t('mount_doom_quote')}"
+              &ldquo;{t('mount_doom_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-red-400 font-semibold">- {t('mount_doom_quote_author')}</p>
           </motion.div>

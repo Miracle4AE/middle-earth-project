@@ -104,7 +104,7 @@ export default function FellowshipPage() {
             className="bg-black/80 backdrop-blur-xl rounded-2xl border-2 border-yellow-700 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-yellow-300 mb-4 italic">
-              "{t('fellowship_quote')}"
+              &ldquo;{t('fellowship_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-yellow-400 font-semibold">- {t('fellowship_quote_author')}</p>
           </motion.div>

@@ -99,7 +99,7 @@ export default function RivendellPage() {
             className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-amber-200 mb-4 italic">
-              "{t('rivendell_quote')}"
+              &ldquo;{t('rivendell_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-amber-300 font-semibold">- {t('rivendell_quote_author')}</p>
           </motion.div>

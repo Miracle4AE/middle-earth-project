@@ -99,7 +99,7 @@ export default function GondorPage() {
             className="bg-black/80 backdrop-blur-xl rounded-2xl border-2 border-gray-700 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-gray-300 mb-4 italic">
-              "{t('gondor_quote')}"
+              &ldquo;{t('gondor_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-gray-400 font-semibold">- {t('gondor_quote_author')}</p>
           </motion.div>

@@ -48,7 +48,7 @@ export default function HelmsDeepPage() {
             className="bg-black/80 backdrop-blur-xl rounded-2xl border-2 border-gray-700 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-gray-300 mb-4 italic">
-              "{t('helms_deep_quote')}"
+              &ldquo;{t('helms_deep_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-gray-400 font-semibold">- {t('helms_deep_quote_author')}</p>
           </motion.div>
@@ -181,7 +181,7 @@ export default function HelmsDeepPage() {
                     {t('aragorn_hero_desc_1')}
                   </p>
                   <p className="text-gray-300">
-                    "{t('aragorn_hero_quote')}"
+                    &ldquo;{t('aragorn_hero_quote')}&rdquo;
                   </p>
                 </div>
                 

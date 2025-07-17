@@ -99,7 +99,7 @@ export default function RohanPage() {
             className="bg-slate-800/90 backdrop-blur-xl rounded-2xl border border-slate-600 p-8 mb-8 shadow-2xl"
           >
             <blockquote className="text-xl md:text-2xl text-slate-200 mb-4 italic">
-              "{t('rohan_quote')}"
+              &ldquo;{t('rohan_quote')}&rdquo;
             </blockquote>
             <p className="text-lg text-slate-400 font-semibold">- {t('rohan_quote_author')}</p>
           </motion.div>
