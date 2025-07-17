@@ -158,8 +158,8 @@ const galleryImages = [
   { src: "/images/gallery/rohan.jpg", alt: { tr: "Rohan", en: "Rohan" } },
   { src: "/images/gallery/gondor.jpg", alt: { tr: "Gondor", en: "Gondor" } },
   { src: "/images/gallery/mordor.jpg", alt: { tr: "Mordor", en: "Mordor" } },
-  { src: "/images/gallery/mt-doom.jpg", alt: { tr: "Mount Doom", en: "Mount Doom" } },
-  { src: "/images/gallery/helmsdeep.jpg", alt: { tr: "Helm's Deep", en: "Helm's Deep" } },
+  { src: "/images/gallery/mount-doom.jpg", alt: { tr: "Mount Doom", en: "Mount Doom" } },
+  { src: "/images/gallery/helms-deep.jpg", alt: { tr: "Helm's Deep", en: "Helm's Deep" } },
   { src: "/images/gallery/galadriel.jpg", alt: { tr: "Galadriel", en: "Galadriel" } },
 ];
 
@@ -870,18 +870,139 @@ export default function Home() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.5, delay: i * 0.08 }}
-                  className="relative overflow-hidden rounded-2xl shadow-xl border-2 border-yellow-700 bg-black/70 group hover:scale-105 hover:shadow-yellow-400/30 hover:border-yellow-400 transition-all duration-300"
+                  className="relative overflow-hidden rounded-2xl shadow-xl border-2 border-yellow-700 bg-black/70 group hover:scale-105 hover:shadow-yellow-400/30 hover:border-yellow-400 transition-all duration-300 cursor-pointer"
                 >
-                  <Image
-                    src={img.src}
-                    alt={img.alt[language]}
-                    width={600}
-                    height={400}
-                    className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
-                  />
-                  <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
-                    <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
-                  </div>
+                  {i === 0 ? (
+                    <MotionLink href="/fellowship">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 1 ? (
+                    <MotionLink href="/shire">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 2 ? (
+                    <MotionLink href="/rivendell">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 3 ? (
+                    <MotionLink href="/rohan">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 4 ? (
+                    <MotionLink href="/gondor">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 5 ? (
+                    <MotionLink href="/mordor">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 6 ? (
+                    <MotionLink href="/mount-doom">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 7 ? (
+                    <MotionLink href="/helms-deep">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : i === 8 ? (
+                    <MotionLink href="/galadriel">
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </MotionLink>
+                  ) : (
+                    <>
+                      <Image
+                        src={img.src}
+                        alt={img.alt[language]}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover group-hover:opacity-90 group-hover:blur-[1px] transition duration-300"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
+                        <span className="font-[Ringbearer] text-lg md:text-2xl text-yellow-300 drop-shadow-[0_0_10px_gold]">{img.alt[language]}</span>
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               ))}
             </div>
