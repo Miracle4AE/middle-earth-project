@@ -6,7 +6,6 @@ const nextConfig: NextConfig = withPWA({
     dest: 'public',
     register: true,
     skipWaiting: true,
-    disable: false, // Geliştirme modunda da aktif olsun
   },
 });
 
