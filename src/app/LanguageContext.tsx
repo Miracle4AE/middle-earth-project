@@ -47,6 +47,8 @@ const translations = {
     'logout': 'Çıkış Yap',
     'hello': 'Merhaba',
     'menu': 'Menüyü Aç/Kapat',
+    'install': 'İndir',
+    'install_app': 'Uygulamayı İndir',
     
     // Dil seçenekleri
     'language': 'Dil',
@@ -613,6 +615,8 @@ const translations = {
     'logout': 'Logout',
     'hello': 'Hello',
     'menu': 'Toggle Menu',
+    'install': 'Install',
+    'install_app': 'Install App',
     
     // Dil seçenekleri
     'language': 'Language',

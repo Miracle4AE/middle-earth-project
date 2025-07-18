@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "./LanguageContext";
 import Image from "next/image";
 import { parsePrice } from "./shop/productsData";
+import InstallAppButton from "./components/InstallAppButton";
 
 type CartItem = { name: string; nameEn?: string; category: string; price: string; img: string; quantity: number };
 
@@ -304,6 +305,11 @@ export default function Navbar() {
         <Link href="/" className="text-yellow-400 font-bold text-lg sm:text-xl md:text-2xl hover:text-yellow-500 transition">
           LOTR
         </Link>
+      </div>
+      
+      {/* PWA Install Button - Logo ile dil seçimi arasında */}
+      <div className="flex items-center">
+        <InstallAppButton />
       </div>
       {/* Menü Linkleri (PC) */}
       <div className="hidden md:flex gap-4 lg:gap-6">
