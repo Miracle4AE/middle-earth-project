@@ -1,63 +1,26 @@
 "use client";
-import { useState, useEffect } from 'react';
 import { useLanguage } from '../LanguageContext';
 
 export default function InstallAppButton() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showInstallButton, setShowInstallButton] = useState(false);
   const { t } = useLanguage();
 
-  useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallButton(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handler);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Eğer PWA desteği yoksa, kullanıcıya manuel kurulum talimatları ver
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isAndroid = /Android/.test(navigator.userAgent);
-      
-      let message = 'Bu siteyi ana ekranınıza eklemek için:\n\n';
-      
-      if (isIOS) {
-        message += '1. Safari\'de paylaş butonuna tıklayın\n2. "Ana Ekrana Ekle" seçeneğini seçin';
-      } else if (isAndroid) {
-        message += '1. Chrome\'da menü butonuna tıklayın\n2. "Ana Ekrana Ekle" seçeneğini seçin';
-      } else {
-        message += '1. Tarayıcınızın menüsünden "Ana Ekrana Ekle" seçeneğini bulun\n2. Siteyi ana ekranınıza ekleyin';
-      }
-      
-      alert(message);
-      return;
+  const handleInstallClick = () => {
+    // Manuel kurulum talimatları göster
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    let message = 'Bu siteyi ana ekranınıza eklemek için:\n\n';
+    
+    if (isIOS) {
+      message += '1. Safari\'de paylaş butonuna tıklayın (kare ve ok işareti)\n2. "Ana Ekrana Ekle" seçeneğini seçin\n3. "Ekle" butonuna tıklayın';
+    } else if (isAndroid) {
+      message += '1. Chrome\'da menü butonuna tıklayın (üç nokta)\n2. "Ana Ekrana Ekle" seçeneğini seçin\n3. "Ekle" butonuna tıklayın';
+    } else {
+      message += '1. Tarayıcınızın adres çubuğundaki yıldız işaretine tıklayın\n2. "Ana Ekrana Ekle" seçeneğini seçin\n3. Siteyi ana ekranınıza ekleyin';
     }
-
-    try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
-        setShowInstallButton(false);
-      }
-    } catch (error) {
-      console.error('PWA kurulum hatası:', error);
-    }
+    
+    alert(message);
   };
-
-  // Test için butonu her zaman göster (geliştirme aşamasında)
-  const shouldShowButton = showInstallButton || process.env.NODE_ENV === 'development';
-
-  if (!shouldShowButton) return null;
 
   return (
     <button
